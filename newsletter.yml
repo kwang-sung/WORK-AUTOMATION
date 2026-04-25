@@ -1,0 +1,55 @@
+name: 골든서퍼 뉴스레터 자동화
+
+on:
+  schedule:
+    # AI 위클리: 매주 월요일 KST 09:00 (UTC 00:00)
+    - cron: '0 0 * * 1'
+    # 골든서퍼 인사이트: 매주 목요일 KST 09:00 (UTC 00:00)
+    - cron: '0 0 * * 4'
+  workflow_dispatch:
+    inputs:
+      newsletter_type:
+        description: '실행할 뉴스레터'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - ai_weekly
+          - purchasing_insight
+          - both
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+
+      # AI 위클리: 월요일만
+      - name: AI 위클리 (월요일)
+        if: |
+          (github.event_name == 'schedule' && github.event.schedule == '0 0 * * 1') ||
+          (github.event_name == 'workflow_dispatch' && (github.event.inputs.newsletter_type == 'ai_weekly' || github.event.inputs.newsletter_type == 'both'))
+        run: python newsletter.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_USER:        ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
+          RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
+
+      # 골든서퍼 인사이트: 월요일 + 목요일
+      - name: 골든서퍼 인사이트 (월·목)
+        if: |
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' && (github.event.inputs.newsletter_type == 'purchasing_insight' || github.event.inputs.newsletter_type == 'both'))
+        run: python purchasing_insight.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_USER:        ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
+          RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
