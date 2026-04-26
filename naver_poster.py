@@ -122,48 +122,77 @@ def _input_body(page, html_content: str):
 
 
 def _click_submit_cafe(page) -> str:
-    """카페 등록 버튼 - BaseButton 기준"""
-    selectors = [
-        "a.BaseButton.BaseButton--skinGreen",
-        "a.BaseButton",
-        "a[role='button']:has-text('등록')",
-        "a:has-text('등록')",
-        "button:has-text('등록')",
-    ]
-    for sel in selectors:
-        try:
-            btn = page.locator(sel).first
-            if btn.is_visible(timeout=3000):
-                btn.click()
-                print(f"  ✅ 카페 등록 버튼 클릭 ({sel})")
-                time.sleep(4)
-                return page.url
-        except Exception:
-            continue
-    print("  ⚠️  카페 버튼 못 찾음")
+    """카페 등록 - 여러 방법 시도"""
+    # 방법 1: JavaScript로 직접 버튼 클릭
+    try:
+        result = page.evaluate("""
+            const btns = document.querySelectorAll('a.BaseButton, button.BaseButton');
+            for (const btn of btns) {
+                const txt = btn.textContent.trim();
+                if (txt.includes('등록') || txt.includes('발행')) {
+                    btn.click();
+                    return 'clicked: ' + txt;
+                }
+            }
+            return 'not found';
+        """)
+        print(f"  ✅ 카페 JS 클릭: {result}")
+        time.sleep(4)
+        if page.url != "": return page.url
+    except Exception as e:
+        print(f"  ⚠️  JS 클릭 실패: {e}")
+
+    # 방법 2: Ctrl+Enter
+    try:
+        page.keyboard.press("Control+Enter")
+        print("  ✅ 카페 Ctrl+Enter 발행")
+        time.sleep(4)
+        return page.url
+    except Exception as e:
+        print(f"  ⚠️  Ctrl+Enter 실패: {e}")
+
     return page.url
 
 
 def _click_submit_blog(page) -> str:
-    """블로그 발행 버튼 - publish_btn 기준"""
-    selectors = [
-        "button[class*='publish_btn']",
-        "button[data-click-area='tpb.publish']",
-        ".text__d09H7:has-text('발행')",
-        "button:has-text('발행')",
-        "a:has-text('발행')",
-    ]
-    for sel in selectors:
-        try:
-            btn = page.locator(sel).first
-            if btn.is_visible(timeout=3000):
-                btn.click()
-                print(f"  ✅ 블로그 발행 버튼 클릭 ({sel})")
-                time.sleep(4)
-                return page.url
-        except Exception:
-            continue
-    print("  ⚠️  블로그 버튼 못 찾음")
+    """블로그 발행 - 여러 방법 시도"""
+    # 방법 1: JavaScript로 직접 버튼 클릭
+    try:
+        result = page.evaluate("""
+            const btns = document.querySelectorAll('button[class*="publish"], button[data-click-area]');
+            for (const btn of btns) {
+                const txt = btn.textContent.trim();
+                if (txt.includes('발행') || txt.includes('등록')) {
+                    btn.click();
+                    return 'clicked: ' + txt;
+                }
+            }
+            // 텍스트로 찾기
+            const allBtns = document.querySelectorAll('button, a[role="button"]');
+            for (const btn of allBtns) {
+                const txt = btn.textContent.trim();
+                if (txt === '발행' || txt === '등록') {
+                    btn.click();
+                    return 'clicked: ' + txt;
+                }
+            }
+            return 'not found';
+        """)
+        print(f"  ✅ 블로그 JS 클릭: {result}")
+        time.sleep(4)
+        return page.url
+    except Exception as e:
+        print(f"  ⚠️  JS 클릭 실패: {e}")
+
+    # 방법 2: Ctrl+Enter
+    try:
+        page.keyboard.press("Control+Enter")
+        print("  ✅ 블로그 Ctrl+Enter 발행")
+        time.sleep(4)
+        return page.url
+    except Exception as e:
+        print(f"  ⚠️  Ctrl+Enter 실패: {e}")
+
     return page.url
 
 
