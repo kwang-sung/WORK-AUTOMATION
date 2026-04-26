@@ -14,11 +14,29 @@ BLOG_WRITE_URL = "https://blog.naver.com/gngsun/postwrite"
 
 def load_cookies() -> list:
     if NAVER_COOKIES:
-        return json.loads(NAVER_COOKIES)
-    if os.path.exists("naver_cookies.json"):
+        cookies = json.loads(NAVER_COOKIES)
+    elif os.path.exists("naver_cookies.json"):
         with open("naver_cookies.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    raise Exception("NAVER_COOKIES 환경변수가 없습니다!")
+            cookies = json.load(f)
+    else:
+        raise Exception("NAVER_COOKIES 환경변수가 없습니다!")
+
+    # sameSite 값 정규화 (EditThisCookie 호환)
+    valid_same_site = {"Strict", "Lax", "None"}
+    for c in cookies:
+        ss = c.get("sameSite", "")
+        if ss not in valid_same_site:
+            c["sameSite"] = "Lax"
+        # expires -1 제거 (Playwright 호환)
+        if c.get("expires", 0) == -1:
+            del c["expires"]
+        # session 필드 제거
+        c.pop("session", None)
+        c.pop("storeId", None)
+        c.pop("id", None)
+        c.pop("hostOnly", None)
+
+    return cookies
 
 
 def _input_title(page, title: str):
