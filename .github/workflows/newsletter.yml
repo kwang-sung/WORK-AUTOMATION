@@ -26,10 +26,7 @@ jobs:
           python-version: '3.11'
       - name: 의존성 설치
         run: pip install -r requirements.txt
-      - name: Playwright 브라우저 설치
-        run: python -m playwright install chromium --with-deps
 
-      # AI 위클리: 월요일만
       - name: AI 위클리 (월요일)
         if: |
           (github.event_name == 'schedule' && github.event.schedule == '0 0 * * 1') ||
@@ -41,9 +38,7 @@ jobs:
           GMAIL_USER:        ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
-          NAVER_COOKIES:     ${{ secrets.NAVER_COOKIES }}                   
 
-      # 골든서퍼 인사이트: 월요일 + 목요일
       - name: 골든서퍼 인사이트 (월·목)
         if: |
           github.event_name == 'schedule' ||
@@ -55,6 +50,3 @@ jobs:
           GMAIL_USER:        ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
-          NAVER_COOKIES:     ${{ secrets.NAVER_COOKIES }}
-         
-
