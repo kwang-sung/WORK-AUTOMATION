@@ -125,7 +125,7 @@ def _click_submit_cafe(page) -> str:
     """카페 등록 - 여러 방법 시도"""
     # 방법 1: JavaScript로 직접 버튼 클릭
     try:
-        result = page.evaluate("""
+        result = page.evaluate("""(() => {
             const btns = document.querySelectorAll('a.BaseButton, button.BaseButton');
             for (const btn of btns) {
                 const txt = btn.textContent.trim();
@@ -135,10 +135,9 @@ def _click_submit_cafe(page) -> str:
                 }
             }
             return 'not found';
-        """)
+        })()""")
         print(f"  ✅ 카페 JS 클릭: {result}")
         time.sleep(4)
-        if page.url != "": return page.url
     except Exception as e:
         print(f"  ⚠️  JS 클릭 실패: {e}")
 
@@ -158,7 +157,7 @@ def _click_submit_blog(page) -> str:
     """블로그 발행 - 여러 방법 시도"""
     # 방법 1: JavaScript로 직접 버튼 클릭
     try:
-        result = page.evaluate("""
+        result = page.evaluate("""(() => {
             const btns = document.querySelectorAll('button[class*="publish"], button[data-click-area]');
             for (const btn of btns) {
                 const txt = btn.textContent.trim();
@@ -167,7 +166,6 @@ def _click_submit_blog(page) -> str:
                     return 'clicked: ' + txt;
                 }
             }
-            // 텍스트로 찾기
             const allBtns = document.querySelectorAll('button, a[role="button"]');
             for (const btn of allBtns) {
                 const txt = btn.textContent.trim();
@@ -177,7 +175,7 @@ def _click_submit_blog(page) -> str:
                 }
             }
             return 'not found';
-        """)
+        })()""")
         print(f"  ✅ 블로그 JS 클릭: {result}")
         time.sleep(4)
         return page.url
