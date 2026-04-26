@@ -103,20 +103,49 @@ def _input_body(page, html_content: str):
         return False
 
 
-def _click_submit(page, label: str) -> str:
-    """등록/발행 버튼 클릭"""
-    btn_texts = ["발행", "등록", "완료", "올리기", "Publish"]
-    for btn_text in btn_texts:
+def _click_submit_cafe(page) -> str:
+    """카페 등록 버튼 - BaseButton 기준"""
+    selectors = [
+        "a.BaseButton.BaseButton--skinGreen",
+        "a.BaseButton",
+        "a[role='button']:has-text('등록')",
+        "a:has-text('등록')",
+        "button:has-text('등록')",
+    ]
+    for sel in selectors:
         try:
-            btn = page.locator(f"button:has-text('{btn_text}')").first
+            btn = page.locator(sel).first
             if btn.is_visible(timeout=3000):
                 btn.click()
-                print(f"  ✅ {label} '{btn_text}' 버튼 클릭")
+                print(f"  ✅ 카페 등록 버튼 클릭 ({sel})")
                 time.sleep(4)
                 return page.url
         except Exception:
             continue
-    print(f"  ⚠️  {label} 버튼 못 찾음")
+    print("  ⚠️  카페 버튼 못 찾음")
+    return page.url
+
+
+def _click_submit_blog(page) -> str:
+    """블로그 발행 버튼 - publish_btn 기준"""
+    selectors = [
+        "button[class*='publish_btn']",
+        "button[data-click-area='tpb.publish']",
+        ".text__d09H7:has-text('발행')",
+        "button:has-text('발행')",
+        "a:has-text('발행')",
+    ]
+    for sel in selectors:
+        try:
+            btn = page.locator(sel).first
+            if btn.is_visible(timeout=3000):
+                btn.click()
+                print(f"  ✅ 블로그 발행 버튼 클릭 ({sel})")
+                time.sleep(4)
+                return page.url
+        except Exception:
+            continue
+    print("  ⚠️  블로그 버튼 못 찾음")
     return page.url
 
 
