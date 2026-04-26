@@ -2,10 +2,8 @@ name: 골든서퍼 뉴스레터 자동화
 
 on:
   schedule:
-    # AI 위클리: 매주 월요일 KST 09:00 (UTC 00:00)
-    - cron: '0 0 * * 1'
-    # 골든서퍼 인사이트: 매주 목요일 KST 09:00 (UTC 00:00)
-    - cron: '0 0 * * 4'
+    - cron: '0 0 * * 1'   # AI 위클리: 매주 월요일 KST 09:00
+    - cron: '0 0 * * 4'   # 골든서퍼 인사이트: 매주 목요일 KST 09:00
   workflow_dispatch:
     inputs:
       newsletter_type:
@@ -26,7 +24,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install -r requirements.txt
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+      - name: Playwright 브라우저 설치
+        run: python -m playwright install chromium --with-deps
 
       # AI 위클리: 월요일만
       - name: AI 위클리 (월요일)
@@ -53,3 +54,5 @@ jobs:
           GMAIL_USER:        ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
+          NAVER_COOKIES:     ${{ secrets.NAVER_COOKIES }}
+
