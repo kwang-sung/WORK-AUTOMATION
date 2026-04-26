@@ -126,12 +126,65 @@ def generate_content(news_text: str) -> tuple:
    - 주의사항
 5. 📢 플랫폼·정책 업데이트
 6. 🤖 쿠대 활용 TIP (자연스럽게 쿠대 프로그램 언급)
+   - 콘텐츠 중간(트렌드 2번째 카드 뒤)에 아래 HTML을 그대로 삽입:
+   <div style="background-color:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #e2b04a;border-radius:0 12px 12px 0;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:24px 0;">
+  <div style="flex:1;">
+    <div style="display:inline-block;background-color:#e2b04a;color:#1a1a2e;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:800;margin-bottom:6px;">FREE</div>
+    <div style="font-size:15px;font-weight:800;color:#1e293b;">쿠대 프로그램 — 지금 무료로 시작하세요</div>
+    <div style="font-size:12px;color:#64748b;margin-top:3px;">구매대행 자동화의 시작 · 누적회원 15,900명</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+    <a href="https://admin.coudae.kr/#/login" style="background-color:#e2b04a;color:#1a1a2e;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료 시작 →</a>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#94a3b8;white-space:nowrap;">
+      <div style="width:14px;height:14px;background-color:#cbd5e1;border-radius:50% 50% 50% 0;display:inline-block;"></div>
+      좌측 하단 말풍선으로 문의하세요
+    </div>
+  </div>
+</div>
 7. 🏄 골든서퍼 총평
    - "안녕하세요, 골든서퍼입니다." 로 시작
    - 이번 주 전체를 아우르는 인사이트 4~5문장
    - 마치 마스터가 직접 쓴 것처럼 자연스럽고 진정성 있게
    - "다음 주에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리
-8. 푸터
+8. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
+   <div style="margin:24px 0;">
+  <div style="font-size:13px;font-weight:800;color:#1e293b;margin-bottom:12px;">🔗 쿠대 공식 채널</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <a href="https://www.youtube.com/@coudae" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#cc0000;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;">▶</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#ffffff;">쿠대 유튜브</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;">구매대행 실전 노하우</div>
+      </div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+    <a href="https://cafe.naver.com/coudae" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#03c75a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;">N</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#ffffff;">쿠대 네이버 카페</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;">회원 18,000명 커뮤니티</div>
+      </div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+    <a href="https://open.kakao.com/o/gKWnrBDg" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#fee500;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3c1e1e;font-size:14px;font-weight:800;flex-shrink:0;">💬</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#ffffff;">쿠대 단톡방</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;">실시간 소싱 정보 공유</div>
+      </div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+    <a href="https://www.threads.com/@coudae_official" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#ffffff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#000;font-size:14px;font-weight:800;flex-shrink:0;">@</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#ffffff;">쿠대 스레드</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;">일상 인사이트 팔로우</div>
+      </div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+  </div>
+</div>
+9. 푸터
 
 ## 디자인 (카페 복붙 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
@@ -276,22 +329,22 @@ def generate_content(news_text: str) -> tuple:
 
     print("  ✍️  요약본 작성 중...")
     summary_resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model="claude-sonnet-4-5",
         max_tokens=3000,
         messages=[{"role": "user", "content": summary_prompt}]
     )
 
     print("  ✍️  카페용 작성 중...")
     cafe_resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=8000,
+        model="claude-sonnet-4-5",
+        max_tokens=16000,
         messages=[{"role": "user", "content": cafe_prompt}]
     )
 
     print("  ✍️  블로그용 작성 중...")
     blog_resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=8000,
+        model="claude-sonnet-4-5",
+        max_tokens=16000,
         messages=[{"role": "user", "content": blog_prompt}]
     )
 
