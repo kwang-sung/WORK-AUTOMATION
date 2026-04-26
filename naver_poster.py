@@ -188,7 +188,7 @@ def post_to_blog(title: str, html_content: str, category: str) -> str:
         _input_body(page, html_content)
 
         # 발행
-        posted_url = _click_submit(page, "블로그")
+        posted_url = _click_submit_blog(page)
         print(f"  ✅ 블로그 완료 → {posted_url}")
 
         browser.close()
@@ -221,7 +221,7 @@ def post_to_cafe(write_url: str, title: str, html_content: str) -> str:
         _input_body(page, html_content)
 
         # 등록
-        posted_url = _click_submit(page, "카페")
+        posted_url = _click_submit_cafe(page)
         print(f"  ✅ 카페 완료 → {posted_url}")
 
         browser.close()
