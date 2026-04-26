@@ -78,14 +78,42 @@ def generate_newsletter_html(news_text: str) -> str:
 6. 이번 주 한 줄 결론
 7. 푸터 "🤖 골든서퍼 AI 위클리 · Powered by Gemini + Claude · {today}"
 
-## 디자인 (인라인 CSS)
-- body 배경: #0f172a
-- 컨텐츠: max-width 680px, margin 0 auto, font-family Arial sans-serif
-- 카드: background #1e293b, border-radius 12px, padding 20px, margin-bottom 16px
-- 강조색: #6366f1 / 텍스트: #cbd5e1 / 제목: #f8fafc / 링크: #818cf8
-- TOP뉴스 카드: border-left 4px solid #6366f1
-- 이모지 풍부하게
-- 푸터: background #0f172a, color #475569, text-align center
+## 디자인 (이메일 호환 인라인 CSS - 절대 준수)
+
+### 핵심 규칙
+- backdrop-filter, filter, opacity, blur 절대 사용 금지 (뿌옇게 보이는 원인)
+- 모든 색상은 명시적 단색으로 (그라데이션 금지)
+- 어두운 배경 위 텍스트는 반드시 밝은 색상 명시
+
+### 전체 레이아웃
+- body: background-color #0f172a, margin 0, padding 0
+- wrapper: max-width 680px, margin 0 auto, padding 16px, font-family Arial sans-serif
+
+### 헤더
+- background-color: #1e3a5f (단색만)
+- border-radius 16px, padding 36px, text-align center
+- 브랜드명: font-size 28px, font-weight 900, color #ffffff (필수)
+- 날짜: color #e2b04a, font-size 13px
+- 핵심한줄: color #94a3b8, font-size 14px
+
+### 뉴스 카드
+- background-color: #1e293b (단색)
+- border-radius 12px, padding 20px, margin-bottom 16px
+- border-left: 4px solid #6366f1
+- 카드 제목: color #f8fafc, font-size 16px, font-weight 800
+- 카드 본문: color #cbd5e1, font-size 14px, line-height 1.8
+- 비즈니스 시사점 박스: background-color #0f2744, border-radius 8px, padding 12px, color #93c5fd
+
+### 섹션 제목
+- color #f8fafc, font-size 18px, font-weight 800
+- border-bottom: 2px solid #6366f1, padding-bottom 8px
+
+### 쿠대 CTA
+- background-color: #4f46e5 (단색)
+- border-radius 12px, padding 20px, text-align center, color #ffffff
+
+### 푸터
+- background-color: #0f172a, color #475569, text-align center, padding 20px
 
 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
