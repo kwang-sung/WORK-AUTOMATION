@@ -7,7 +7,8 @@ Gemini API로 서치 → Claude API로 글쓰기
 import os
 import smtplib
 import anthropic
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -18,14 +19,12 @@ try:
 except ImportError:
     pass
 
-# ─── 설정 ─────────────────────────────────────────────────
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GEMINI_API_KEY    = os.environ.get("GEMINI_API_KEY", "")
 GMAIL_USER        = os.environ.get("GMAIL_USER", "")
 GMAIL_APP_PW      = os.environ.get("GMAIL_APP_PW", "")
 RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
 
-# ─── 서치 쿼리 ────────────────────────────────────────────
 SEARCH_QUERIES = [
     "latest AI news this week OpenAI Anthropic Google 2026",
     "new AI model release this week 2026",
@@ -35,35 +34,27 @@ SEARCH_QUERIES = [
     "AI 구매대행 자동화 이커머스 2026",
 ]
 
-
-# ─── 1. Gemini로 뉴스 서치 ────────────────────────────────
 def collect_news_with_gemini() -> str:
-    """Gemini API + Google Search 그라운딩으로 최신 뉴스 수집"""
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-2.5-flash")
-
+    client = genai.Client(api_key=GEMINI_API_KEY)
     collected = []
     for query in SEARCH_QUERIES:
         try:
-            resp = model.generate_content(
-                f"다음 주제로 이번 주 최신 뉴스 5개를 찾아서 "
-                f"'제목 | 핵심내용 2문장 | URL' 형식으로 한국어로 답변해줘: {query}",
-                tools="google_search_retrieval",
+            resp = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=f"다음 주제로 이번 주 최신 뉴스 5개를 찾아서 '제목 | 핵심내용 2문장 | URL' 형식으로 한국어로 답변해줘: {query}",
+                config=types.GenerateContentConfig(
+                    tools=[types.Tool(google_search=types.GoogleSearch())]
+                )
             )
             collected.append(f"[{query}]\n{resp.text}")
             print(f"    ✅ {query[:45]}...")
         except Exception as e:
             print(f"    ⚠️  실패: {e}")
-
     return "\n\n---\n\n".join(collected)
 
-
-# ─── 2. Claude로 뉴스레터 HTML 생성 ──────────────────────
 def generate_newsletter_html(news_text: str) -> str:
-    """수집된 뉴스를 Claude가 받아서 뉴스레터 HTML 작성"""
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     today  = datetime.now().strftime("%Y년 %m월 %d일")
-
     prompt = f"""
 당신은 AI 트렌드 전문 뉴스레터 에디터입니다. 오늘은 {today}입니다.
 수신자: 구매대행 사업자·AI 자동화 프로그램 '쿠대' 운영자·유튜브 크리에이터
@@ -94,16 +85,13 @@ def generate_newsletter_html(news_text: str) -> str:
 
 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
-
     resp = client.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-haiku-4-5-20251001",
         max_tokens=4096,
         messages=[{"role": "user", "content": prompt}]
     )
     return resp.content[0].text
 
-
-# ─── 3. Gmail 발송 ────────────────────────────────────────
 def send_email(html: str, subject: str) -> bool:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -121,8 +109,6 @@ def send_email(html: str, subject: str) -> bool:
         print(f"  ❌ 발송 실패: {e}")
         return False
 
-
-# ─── 4. HTML 저장 ─────────────────────────────────────────
 def save_preview(html: str) -> str:
     fname = f"newsletter_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
     with open(fname, "w", encoding="utf-8") as f:
@@ -130,27 +116,22 @@ def save_preview(html: str) -> str:
     print(f"  📄 저장: {fname}")
     return fname
 
-
-# ─── 메인 ─────────────────────────────────────────────────
 def main():
     print("=" * 55)
     print("🤖 AI 위클리 뉴스레터 시작")
     print(f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 55)
 
-    # 1. Gemini로 서치
     print("\n📡 Gemini로 AI 뉴스 수집 중...")
     news_text = collect_news_with_gemini()
     print("   수집 완료\n")
 
-    # 2. Claude로 HTML 생성
     print("✍️  Claude가 뉴스레터 작성 중...")
     html = generate_newsletter_html(news_text)
     print("   작성 완료\n")
 
     save_preview(html)
 
-    # 3. 발송
     today   = datetime.now().strftime("%Y년 %m월 %d일")
     subject = f"🤖 골든서퍼 AI 위클리 | {today}"
 
@@ -158,11 +139,10 @@ def main():
         print("📧 이메일 발송 중...")
         send_email(html, subject)
     else:
-        print("⚠️  .env 파일 이메일 설정 필요")
+        print(f"⚠️  환경변수 확인: GMAIL_USER={GMAIL_USER}, RECIPIENT={RECIPIENT_EMAIL}")
 
     print("\n✅ 완료!")
     print("=" * 55)
-
 
 if __name__ == "__main__":
     main()
