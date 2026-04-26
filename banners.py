@@ -49,40 +49,38 @@ BANNER_COUDAE_DARK = """
 </table>
 """
 
-# ── SNS 공식채널 (한 행 배치) ─────────────────────────────
+# ── SNS 공식채널 (좌측 정렬 한 행) ──────────────────────
 BANNER_SNS = """
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+<table cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
   <tr>
+    <td style="padding-bottom:10px;" colspan="4">
+      <div style="font-size:12px;font-weight:800;color:#1e293b;">🔗 쿠대 공식채널 바로가기</div>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-right:20px;">
+      <a href="https://www.youtube.com/@coudae" style="text-decoration:none;display:block;text-align:center;">
+        <div style="width:36px;height:36px;background-color:#cc0000;border-radius:8px;text-align:center;line-height:36px;font-size:14px;font-weight:800;color:#ffffff;">▶</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">유튜브</div>
+      </a>
+    </td>
+    <td style="padding-right:20px;">
+      <a href="https://cafe.naver.com/coudae" style="text-decoration:none;display:block;text-align:center;">
+        <div style="width:36px;height:36px;background-color:#03c75a;border-radius:8px;text-align:center;line-height:36px;font-size:14px;font-weight:800;color:#ffffff;">N</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">카페</div>
+      </a>
+    </td>
+    <td style="padding-right:20px;">
+      <a href="https://open.kakao.com/o/gKWnrBDg" style="text-decoration:none;display:block;text-align:center;">
+        <div style="width:36px;height:36px;background-color:#fee500;border-radius:8px;text-align:center;line-height:36px;font-size:16px;">💬</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">단톡방</div>
+      </a>
+    </td>
     <td>
-      <div style="font-size:12px;font-weight:800;color:#1e293b;margin-bottom:12px;">🔗 쿠대 공식채널 바로가기</div>
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td width="25%" style="text-align:center;padding:0 4px;">
-            <a href="https://www.youtube.com/@coudae" style="text-decoration:none;display:block;">
-              <div style="width:36px;height:36px;background-color:#cc0000;border-radius:8px;text-align:center;line-height:36px;font-size:14px;font-weight:800;color:#ffffff;margin:0 auto;">▶</div>
-              <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">유튜브</div>
-            </a>
-          </td>
-          <td width="25%" style="text-align:center;padding:0 4px;">
-            <a href="https://cafe.naver.com/coudae" style="text-decoration:none;display:block;">
-              <div style="width:36px;height:36px;background-color:#03c75a;border-radius:8px;text-align:center;line-height:36px;font-size:14px;font-weight:800;color:#ffffff;margin:0 auto;">N</div>
-              <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">네이버 카페</div>
-            </a>
-          </td>
-          <td width="25%" style="text-align:center;padding:0 4px;">
-            <a href="https://open.kakao.com/o/gKWnrBDg" style="text-decoration:none;display:block;">
-              <div style="width:36px;height:36px;background-color:#fee500;border-radius:8px;text-align:center;line-height:36px;font-size:16px;margin:0 auto;">💬</div>
-              <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">단톡방</div>
-            </a>
-          </td>
-          <td width="25%" style="text-align:center;padding:0 4px;">
-            <a href="https://www.threads.com/@coudae_official" style="text-decoration:none;display:block;">
-              <div style="width:36px;height:36px;background-color:#0f172a;border-radius:8px;text-align:center;line-height:36px;font-size:13px;font-weight:800;color:#ffffff;margin:0 auto;">@</div>
-              <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">스레드</div>
-            </a>
-          </td>
-        </tr>
-      </table>
+      <a href="https://www.threads.com/@coudae_official" style="text-decoration:none;display:block;text-align:center;">
+        <div style="width:36px;height:36px;background-color:#0f172a;border-radius:8px;text-align:center;line-height:36px;font-size:13px;font-weight:800;color:#ffffff;">@</div>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">스레드</div>
+      </a>
     </td>
   </tr>
 </table>
