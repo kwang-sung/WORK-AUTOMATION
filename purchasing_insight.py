@@ -3,12 +3,9 @@
 골든서퍼 인사이트 - 구매대행 뉴스레터
 매주 월요일·목요일 09:00 자동 실행
 
-파이프라인:
-1. Gemini → 뉴스 수집
-2. Claude → 상세본(카페·블로그용) + 요약본(메일용) 작성
-3. naver_poster → 카페 자동 게시
-4. naver_poster → 블로그 자동 포스팅
-5. Gmail → 요약본 + 카페링크 발송
+메일 2통 발송:
+1. 요약본 - 빠르게 검토용
+2. 상세본 - 카페·블로그 복붙용
 """
 
 import os
@@ -19,7 +16,6 @@ from google.genai import types
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from naver_poster import post_to_cafe, post_to_blog
 
 try:
     from dotenv import load_dotenv
@@ -27,16 +23,11 @@ try:
 except ImportError:
     pass
 
-# ─── 설정 ─────────────────────────────────────────────────
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 GEMINI_API_KEY    = os.environ.get("GEMINI_API_KEY", "")
 GMAIL_USER        = os.environ.get("GMAIL_USER", "")
 GMAIL_APP_PW      = os.environ.get("GMAIL_APP_PW", "")
 RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
-
-CAFE_ID    = "30518405"
-MENU_ID    = "370"
-WRITE_URL  = f"https://cafe.naver.com/f-e/cafes/{CAFE_ID}/menus/{MENU_ID}/articles/write"
 
 SEARCH_QUERIES = [
     "구매대행 최신 트렌드 아이템 2026 국내",
@@ -50,7 +41,8 @@ SEARCH_QUERIES = [
 ]
 
 
-def collect_news_with_gemini() -> str:
+# ─── 1. Gemini 서치 ───────────────────────────────────────
+def collect_news() -> str:
     client = genai.Client(api_key=GEMINI_API_KEY)
     collected = []
     for query in SEARCH_QUERIES:
@@ -69,80 +61,149 @@ def collect_news_with_gemini() -> str:
     return "\n\n---\n\n".join(collected)
 
 
+# ─── 2. Claude 글쓰기 ─────────────────────────────────────
 def generate_content(news_text: str) -> tuple:
     client    = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     today     = datetime.now().strftime("%Y년 %m월 %d일")
     weekday   = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
     issue_num = datetime.now().strftime("%Y%m%d")
 
+    # ── 상세본 (카페·블로그 복붙용) ──────────────────────
     detail_prompt = f"""
-당신은 구매대행 전문 콘텐츠 에디터 '골든서퍼'입니다. 오늘은 {today}({weekday}요일)입니다.
-아래 수집된 정보로 네이버 카페·블로그에 올릴 심도 있는 HTML 콘텐츠를 작성하세요.
+당신은 구매대행 전문 콘텐츠 에디터 '골든서퍼'입니다.
+오늘은 {today}({weekday}요일)입니다.
+
+아래 수집된 정보로 네이버 카페·블로그에 바로 복붙 가능한
+완성형 HTML 콘텐츠를 작성하세요.
 
 ===== 수집 정보 =====
 {news_text}
 =====================
 
 ## 구성
-1. 헤더 배너 (골든서퍼 인사이트 #{issue_num} / {today})
+1. 헤더 배너 (골든서퍼 인사이트 #{issue_num} / {today} / {weekday}요일)
 2. 이번 호 핵심 3줄 요약 박스
-3. 국내 구매대행 트렌드 3개 (제목 / 상세설명 6~8문장 / 실전팁 3가지 / 주의사항)
-4. 해외 소싱 추천 아이템 3~4개 (제목 / 상세설명 6~8문장 / 소싱방법 / 예상마진 / 주의사항)
-5. 플랫폼·정책 업데이트 상세
-6. 쿠대 프로그램 자연스러운 언급
+3. 국내 구매대행 트렌드 3개
+   - 섹션 제목 / 아이콘 이모지
+   - 상세 설명 6~8문장
+   - 실전 적용 팁 3가지 (번호 목록)
+   - 주의사항
+4. 해외 소싱 추천 아이템 3~4개
+   - 아이템명 + 이모지
+   - 상세 설명 6~8문장
+   - 소싱 방법 (구체적 사이트명 포함)
+   - 예상 마진율
+   - 주의사항
+5. 플랫폼·정책 업데이트
+6. 쿠대 프로그램 자연스러운 CTA
+   ("이런 소싱 작업을 자동화하려면 쿠대 프로그램을 활용해보세요 →")
 7. 골든서퍼 한마디 (🏄, 핵심 인사이트 3~4문장)
-8. 푸터 "골든서퍼 인사이트 | {today} | Powered by Gemini + Claude"
+8. 푸터
 
-## 디자인 (카페 복붙 최적화 인라인 CSS - 절대 준수)
-- backdrop-filter, filter, opacity, blur 절대 사용 금지
-- 모든 색상 명시적 단색만 사용 (그라데이션 금지)
-- max-width 720px, font-family Noto Sans KR Arial sans-serif
-- 헤더: background-color #1a3a6b, border-radius 16px, padding 40px, text-align center
-- 헤더 제목: color #ffffff, font-size 28px, font-weight 900 (필수)
-- 날짜뱃지: background-color #e2b04a, color #1a1a2e, border-radius 20px, padding 6px 18px
-- 요약박스: background-color #fef9ec, border-left 5px solid #e2b04a, border-radius 8px, padding 20px
-- 카드: background-color #ffffff, border-radius 12px, padding 24px, margin-bottom 16px
-- 국내카드 border-top: 4px solid #3b82f6
-- 해외카드 border-top: 4px solid #10b981
-- 플랫폼카드 border-top: 4px solid #f59e0b
-- 카드 제목: color #0f172a, font-size 16px, font-weight 800
-- 카드 본문: color #334155, font-size 14px, line-height 1.8
-- 실전팁: background-color #f0fdf4, border-radius 8px, padding 14px, color #166534
-- 쿠대CTA: background-color #4f46e5, border-radius 12px, padding 20px, text-align center, color #ffffff
-- 골든서퍼한마디: background-color #1a3a6b, color #ffffff, border-radius 12px, padding 28px
-- 이모지 풍부하게
+## 디자인 (카페·블로그 복붙 최적화 - 인라인 CSS 필수)
+### 절대 금지
+- backdrop-filter, filter, blur, opacity 사용 금지
+- 그라데이션 배경 금지 (단색만)
+- 외부 폰트 로드 금지
 
-순수 HTML만 반환. 코드블록·마크다운 없이.
+### 전체
+- max-width: 720px, margin: 0 auto
+- font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
+- background-color: #ffffff
+
+### 헤더 배너
+- background-color: #1a3a6b
+- border-radius: 16px, padding: 40px 36px, text-align: center
+- 브랜드명: font-size 30px, font-weight 900, color #ffffff
+- 부제: font-size 14px, color #94a3b8, margin-top 8px
+- 날짜 뱃지: background-color #e2b04a, color #1a1a2e, border-radius 20px, padding 6px 20px, font-size 13px, font-weight 700, display inline-block, margin-top 16px
+
+### 핵심 요약 박스
+- background-color: #fffbeb
+- border-left: 5px solid #e2b04a
+- border-radius: 8px, padding: 20px 24px, margin: 16px 0
+- 제목: font-size 14px, font-weight 700, color #92400e, margin-bottom 12px
+- 항목: font-size 14px, color #1e293b, line-height 1.8, padding-left 20px
+
+### 섹션 제목
+- font-size: 20px, font-weight: 900, color: #1e293b
+- border-left: 5px solid #e2b04a, padding-left: 14px
+- margin: 32px 0 16px
+
+### 뉴스 카드
+- background-color: #ffffff
+- border: 1px solid #e2e8f0
+- border-radius: 12px, padding: 24px, margin-bottom: 16px
+- 국내트렌드: border-top 4px solid #3b82f6
+- 해외소싱: border-top 4px solid #10b981
+- 플랫폼: border-top 4px solid #f59e0b
+- 카드 제목: font-size 17px, font-weight 800, color #0f172a, margin-bottom 12px
+- 카드 본문: font-size 14px, color #334155, line-height 1.9
+
+### 실전팁 박스
+- background-color: #f0fdf4
+- border-radius: 8px, padding: 16px 20px
+- font-size: 13px, color: #166534, line-height: 1.8
+- margin-top: 12px
+
+### 마진 뱃지
+- display: inline-block
+- background-color: #dcfce7, color: #166534
+- border-radius: 6px, padding: 4px 12px
+- font-size: 13px, font-weight: 700
+
+### 쿠대 CTA
+- background-color: #4f46e5
+- border-radius: 12px, padding: 24px, text-align: center, margin: 24px 0
+- 제목: font-size 18px, font-weight 800, color #ffffff
+- 설명: font-size 14px, color #c7d2fe, margin-top 8px
+
+### 골든서퍼 한마디
+- background-color: #1a3a6b
+- border-radius: 12px, padding: 28px
+- font-size: 15px, color: #ffffff, line-height: 1.9
+
+### 푸터
+- text-align: center, padding: 24px
+- font-size: 12px, color: #94a3b8
+
+이모지 풍부하게 사용. 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
 
+    # ── 요약본 (빠른 검토용) ─────────────────────────────
     summary_prompt = f"""
-당신은 구매대행 전문 뉴스레터 에디터입니다. 오늘은 {today}({weekday}요일)입니다.
-아래 수집된 정보로 1~2분 안에 읽히는 이메일용 요약 뉴스레터를 작성하세요.
+당신은 구매대행 전문 뉴스레터 에디터입니다.
+오늘은 {today}({weekday}요일)입니다.
+
+아래 수집된 정보로 1~2분 안에 읽히는
+모바일 최적화 이메일 요약 뉴스레터를 작성하세요.
 
 ===== 수집 정보 =====
 {news_text}
 =====================
 
 ## 구성
-1. 헤더 (골든서퍼 인사이트 / {today})
-2. 이번 호 핵심 3가지 (각 1~2문장)
-3. 주요 트렌드 3개 (각 2~3문장)
-4. 추천 소싱 아이템 3개 (각 1~2문장 + 예상마진)
-5. CTA 버튼 "📌 카페에서 전체 내용 보기" (href={{CAFE_URL}})
-6. 골든서퍼 한마디 (1~2문장)
-7. 푸터
+1. 간결한 헤더 (골든서퍼 인사이트 / {today})
+2. ⚡ 이번 호 핵심 3가지 (각 1~2문장, 불릿)
+3. 🇰🇷 국내 트렌드 TOP 3 (각 2문장)
+4. 🌏 해외 소싱 추천 TOP 3 (각 1문장 + 마진)
+5. 📢 플랫폼 업데이트 1~2개 (각 1문장)
+6. 🏄 골든서퍼 한마디 (1~2문장)
+7. 푸터 "상세 내용은 별도 메일을 확인하세요"
 
-## 디자인 (이메일 호환 인라인 CSS)
-- backdrop-filter, filter, blur 절대 사용 금지
-- max-width 600px, font-family Arial sans-serif
-- 헤더: background-color #1a3a6b, color #ffffff, padding 24px, border-radius 12px, text-align center
-- 날짜: color #e2b04a, font-weight 700
-- 항목: background-color #f8fafc, border-left 4px solid #e2b04a, padding 14px, margin-bottom 10px
-- CTA: background-color #e2b04a, color #1a1a2e, padding 14px 28px, border-radius 8px, font-weight 800, text-decoration none, display inline-block
-- 골든서퍼한마디: background-color #1a3a6b, color #ffffff, padding 16px, border-radius 8px
-- 이모지 적절히
+## 디자인 (모바일 최적화 인라인 CSS)
+- max-width: 600px, margin: 0 auto
+- font-family: Arial, sans-serif
+- 헤더: background-color #1a3a6b, color #ffffff, padding 20px, text-align center, border-radius 10px
+- 날짜: color #e2b04a, font-weight 700, font-size 13px
+- 섹션: background-color #f8fafc, border-left 4px solid #e2b04a, padding 14px 16px, margin-bottom 10px, border-radius 4px
+- 섹션제목: font-size 14px, font-weight 800, color #1e293b, margin-bottom 8px
+- 본문: font-size 13px, color #475569, line-height 1.7
+- 마진뱃지: background-color #dcfce7, color #166534, border-radius 4px, padding 2px 8px, font-size 12px, font-weight 700
+- 골든서퍼: background-color #1a3a6b, color #ffffff, padding 16px, border-radius 8px, font-size 13px
+- 푸터: text-align center, font-size 11px, color #94a3b8, padding 16px
 
-순수 HTML만 반환. 코드블록·마크다운 없이.
+이모지 적절히. 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
 
     print("  ✍️  상세본 작성 중...")
@@ -155,13 +216,14 @@ def generate_content(news_text: str) -> tuple:
     print("  ✍️  요약본 작성 중...")
     summary_resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=2000,
+        max_tokens=2500,
         messages=[{"role": "user", "content": summary_prompt}]
     )
 
     return detail_resp.content[0].text, summary_resp.content[0].text
 
 
+# ─── 3. 메일 발송 ─────────────────────────────────────────
 def send_email(html: str, subject: str) -> bool:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -173,61 +235,58 @@ def send_email(html: str, subject: str) -> bool:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(GMAIL_USER, GMAIL_APP_PW)
             server.sendmail(GMAIL_USER, RECIPIENT_EMAIL, msg.as_string())
-        print(f"  ✅ 메일 발송 완료 → {RECIPIENT_EMAIL}")
+        print(f"  ✅ 발송 완료 → {RECIPIENT_EMAIL}")
         return True
     except Exception as e:
-        print(f"  ❌ 메일 발송 실패: {e}")
+        print(f"  ❌ 발송 실패: {e}")
         return False
 
 
+# ─── 4. HTML 저장 ─────────────────────────────────────────
+def save_preview(html: str, prefix: str) -> str:
+    fname = f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    with open(fname, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"  📄 저장: {fname}")
+    return fname
+
+
+# ─── 메인 ─────────────────────────────────────────────────
 def main():
     print("=" * 55)
-    print("🏄 골든서퍼 인사이트 전체 파이프라인 시작")
+    print("🏄 골든서퍼 인사이트 시작")
     print(f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 55)
 
-    # 1. Gemini 서치
     print("\n📡 Gemini 뉴스 수집 중...")
-    news_text = collect_news_with_gemini()
+    news_text = collect_news()
     print("   수집 완료\n")
 
-    # 2. Claude 글쓰기
     print("✍️  Claude 콘텐츠 작성 중...")
     detail_html, summary_html = generate_content(news_text)
     print("   작성 완료\n")
 
+    save_preview(detail_html, "detail")
+    save_preview(summary_html, "summary")
+
     today   = datetime.now().strftime("%Y년 %m월 %d일")
     weekday = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
-    title   = f"🏄 골든서퍼 인사이트 | {today}({weekday}) 구매대행 트렌드 리포트"
 
-    # 3. 카페 게시
-    cafe_url = ""
-    print("📌 네이버 카페 게시 중...")
-    try:
-        cafe_url = post_to_cafe(WRITE_URL, title, detail_html)
-    except Exception as e:
-        print(f"  ❌ 카페 실패: {e}")
-
-    # 4. 블로그 포스팅
-    print("\n📌 네이버 블로그 포스팅 중...")
-    try:
-        post_to_blog(title, detail_html, "구매대행 인사이트")
-    except Exception as e:
-        print(f"  ❌ 블로그 실패: {e}")
-
-    # 5. 카페 링크 삽입 후 메일 발송
-    summary_html = summary_html.replace(
-        "{CAFE_URL}",
-        cafe_url if cafe_url else "https://cafe.naver.com/coudae"
+    # 요약본 발송
+    print("📧 요약본 메일 발송 중...")
+    send_email(
+        summary_html,
+        f"🏄 [요약] 골든서퍼 인사이트 | {today}({weekday})"
     )
 
-    print("\n📧 이메일 발송 중...")
-    subject = f"🏄 골든서퍼 인사이트 | {today}({weekday}) - 카페 새글 알림"
-    if GMAIL_USER and GMAIL_APP_PW and RECIPIENT_EMAIL:
-        send_email(summary_html, subject)
+    # 상세본 발송
+    print("📧 상세본 메일 발송 중...")
+    send_email(
+        detail_html,
+        f"📋 [카페·블로그용] 골든서퍼 인사이트 | {today}({weekday})"
+    )
 
-    print("\n✅ 전체 파이프라인 완료!")
-    print(f"   카페: {cafe_url}")
+    print("\n✅ 완료!")
     print("=" * 55)
 
 
