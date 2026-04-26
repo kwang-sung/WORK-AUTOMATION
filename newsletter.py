@@ -40,7 +40,7 @@ SEARCH_QUERIES = [
 def collect_news_with_gemini() -> str:
     """Gemini API + Google Search 그라운딩으로 최신 뉴스 수집"""
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     collected = []
     for query in SEARCH_QUERIES:
