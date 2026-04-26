@@ -96,7 +96,7 @@ def generate_newsletter_html(news_text: str) -> str:
 """
 
     resp = client.messages.create(
-        model="claude-sonnet-4-5",
+        model="claude-sonnet-4-6",
         max_tokens=4096,
         messages=[{"role": "user", "content": prompt}]
     )
