@@ -118,6 +118,11 @@ def post_to_threads(text: str) -> bool:
     container_id = container_resp.json().get("id")
     print(f"  ✅ 컨테이너 생성: {container_id}")
 
+    # 컨테이너 준비 대기
+    import time
+    print("  ⏳ 컨테이너 준비 중... (30초 대기)")
+    time.sleep(30)
+
     # Step 2: 발행
     publish_url = f"https://graph.threads.net/v1.0/{THREADS_USER_ID}/threads_publish"
     publish_resp = requests.post(publish_url, data={
