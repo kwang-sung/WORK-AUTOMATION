@@ -4,7 +4,6 @@ on:
   schedule:
     - cron: '30 0 * * 1'   # AI 위클리: 매주 월요일 KST 09:30
     - cron: '30 0 * * 4'   # 골든서퍼 인사이트: 매주 목요일 KST 09:30
-    - cron: '0 0 * * *'    # 스레드 포스팅: 매일 KST 09:00
   workflow_dispatch:
     inputs:
       newsletter_type:
@@ -16,15 +15,10 @@ on:
           - ai_weekly
           - purchasing_insight
           - both
-          - threads
 
 jobs:
-  # ── 뉴스레터 ──────────────────────────────────────────
   send-newsletter:
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'schedule' && github.event.schedule != '0 0 * * *') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.newsletter_type != 'threads')
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -56,24 +50,3 @@ jobs:
           GMAIL_USER:        ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
-
-  # ── 스레드 포스팅 ─────────────────────────────────────
-  threads-posting:
-    runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 0 * * *') ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.newsletter_type == 'threads')
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: 의존성 설치
-        run: pip install -r requirements.txt
-      - name: 스레드 포스팅
-        run: python threads_poster.py
-        env:
-          ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
-          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_USER_ID:      ${{ secrets.THREADS_USER_ID }}
