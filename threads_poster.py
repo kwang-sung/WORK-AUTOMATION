@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 쿠대 스레드 자동 포스팅
-매일 오전 9시 실행
+매일 저녁 8시 실행
 Gemini로 아이템 서치 → Claude가 스레드용 글 작성 → Threads API 포스팅
 """
 
