@@ -1,8 +1,8 @@
-name: 스레드 자동 포스팅
+name: 쿠대 자동화 업무 — 스레드
 
 on:
   schedule:
-    - cron: '22 1 * * *'   # 테스트: KST 10:22 (약 5분 후)
+    - cron: '0 11 * * *'   # 매일 KST 20:00
   workflow_dispatch:
 
 jobs:
