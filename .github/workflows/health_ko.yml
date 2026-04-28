@@ -1,5 +1,4 @@
-
-name: 쿠대 자동화 업무 — 시니어 건강 채널
+name: 쿠대 자동화 업무 — 시니어 건강 한국어
 
 on:
   schedule:
@@ -8,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  health-script:
+  health-ko:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,12 +16,11 @@ jobs:
           python-version: '3.11'
       - name: 의존성 설치
         run: pip install -r requirements.txt
-      - name: 대본 생성
-        run: python youtube_health_script.py
+      - name: 한국어 대본 생성
+        run: python youtube_health_ko.py
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
           GMAIL_USER:        ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
-
