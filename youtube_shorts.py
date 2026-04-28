@@ -127,7 +127,7 @@ def generate_content(topic: dict, search_data: dict) -> dict:
     month   = datetime.now().month
 
     prompt = f"""
-당신은 구매대행 전문 유튜브 쇼츠 제작자입니다.
+당신은 구매대행 전문 유튜브 쇼츠 제작자이자 클링 3.0 전문가입니다.
 오늘은 {today}입니다.
 
 아래 서치 정보를 바탕으로 유튜브 쇼츠 제작 패키지를 만들어주세요.
@@ -145,56 +145,43 @@ def generate_content(topic: dict, search_data: dict) -> dict:
 
 ## 출력 형식 (정확히 이 형식으로)
 
-### 📋 오늘의 주제
-{topic['title']}
+TOPIC: {topic['title']}
 
----
+---KLING_PROMPT_START---
+Shot 1: (훅 장면 - 강렬한 상품 클로즈업. 카메라 무브·조명·분위기 구체적으로. 영어로 작성)
 
-### 🎬 클링 3.0 프롬프트 (15초 단일 클립)
+Shot 2: (정보 장면 - 상품 특징·마진율 텍스트 오버레이. 역동적 전환. 영어로 작성. 텍스트 오버레이 내용 포함)
 
-**[프롬프트 - 영어]**
+Shot 3: (CTA 장면 - 라이프스타일 배치샷. Text overlay: "쿠대 카페에서 더 알아보기". 영어로 작성)
 
-[0-5s] (훅 장면: 강렬하고 시선을 잡는 상품 클로즈업. 카메라 무브·조명·분위기 구체적으로 작성)
-[5-10s] (정보 장면: 상품 특징·마진율 텍스트 오버레이. 역동적 전환. 구체적으로 작성)
-[10-15s] (CTA 장면: 라이프스타일 배치샷. 화면에 "쿠대 카페에서 더 알아보기" 텍스트 포함)
-Consistent color grading throughout, smooth transitions, vertical 9:16 format for YouTube Shorts.
+Vertical 9:16 format, teal and orange color grade, smooth transitions, professional e-commerce aesthetic.
+Negative prompt: blurry, distorted text, morphing products, watermark.
+---KLING_PROMPT_END---
 
----
+---IMAGE_START---
+메인: (이미지 URL 목록에서 가장 적합한 검증된 URL. 없으면 아마존 상품 검색 키워드)
+대체: (두 번째 URL 또는 키워드)
+---IMAGE_END---
 
-### 🖼️ 클링 레퍼런스 이미지
-(Image-to-Video용 - 검증된 실제 URL만 사용)
-- 메인 이미지: [이미지 URL 목록에서 검증된 URL 1순위]
-- 대체 이미지: [검증된 URL 2순위]
+---NARRATION_START---
+[0-5s]: (훅 - 1~2문장. 강렬한 훅. 한국어)
+[5-10s]: (정보 - 2~3문장. 구체적 마진율·소싱처. 한국어)
+[10-15s]: (CTA - 1문장. 카페 방문·구독 유도. 한국어)
 
----
+BGM: (오디오 분위기 한 줄. BPM 포함)
+---NARRATION_END---
 
-### 🎙️ 나레이션 스크립트 (15초)
+---META_START---
+제목A: (감정 자극. 40자 이내)
+제목B: (정보성. 숫자 포함. 40자 이내)
+설명: (3~5줄. SEO 키워드 + cafe.naver.com/coudae 포함)
+해시태그: #구매대행 #해외직구 #소싱 #쿠대 #유튜브쇼츠 (주제 관련 5개 추가)
+---META_END---
 
-**나레이션 텍스트:**
-[0-5s]: (훅 - 1~2문장. 강렬한 훅)
-[5-10s]: (정보 - 2~3문장. 구체적 마진율·소싱처)
-[10-15s]: (CTA - 1문장. 카페 방문·구독 유도)
-
-**오디오 분위기:**
-[전체 BGM 지시 - 에너지 넘치는 비트 or 트렌디한 팝 등]
-
----
-
-### 📱 유튜브 메타데이터
-
-**제목 A** (감정 자극. 40자 이내):
-**제목 B** (정보성. 숫자 포함. 40자 이내):
-
-**설명**:
-(3~5줄. SEO 키워드 + 카페링크 cafe.naver.com/coudae 포함)
-
-**해시태그**:
-#구매대행 #해외직구 #소싱 #[주제관련태그] #쿠대 #유튜브쇼츠
-
----
-
-### 💡 제작 팁
-[이 영상 제작 시 주의사항 2가지]
+---TIP_START---
+팁1: (제작 주의사항)
+팁2: (제작 주의사항)
+---TIP_END---
 """
 
     resp = client.messages.create(
@@ -207,35 +194,60 @@ Consistent color grading throughout, smooth transitions, vertical 9:16 format fo
 
 
 # ─── 3. 메일 발송 ─────────────────────────────────────────
+def parse_section(content: str, start_tag: str, end_tag: str) -> str:
+    """태그 사이 내용 추출"""
+    try:
+        start = content.index(start_tag) + len(start_tag)
+        end   = content.index(end_tag)
+        return content[start:end].strip()
+    except ValueError:
+        return ""
+
+
 def send_email(content: str, topic_title: str, today: str) -> bool:
+
+    kling    = parse_section(content, "---KLING_PROMPT_START---", "---KLING_PROMPT_END---")
+    image    = parse_section(content, "---IMAGE_START---", "---IMAGE_END---")
+    narr     = parse_section(content, "---NARRATION_START---", "---NARRATION_END---")
+    meta     = parse_section(content, "---META_START---", "---META_END---")
+    tip      = parse_section(content, "---TIP_START---", "---TIP_END---")
+
+    def box(title: str, icon: str, body: str, color: str = "#6366f1") -> str:
+        return f"""
+<div style="margin-bottom:20px;">
+  <div style="background-color:{color};color:#ffffff;padding:10px 16px;border-radius:8px 8px 0 0;font-size:13px;font-weight:800;">{icon} {title}</div>
+  <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 8px 8px;padding:16px;font-size:13px;color:#1e293b;line-height:1.8;white-space:pre-wrap;font-family:monospace;">{body}</div>
+</div>"""
+
     html = f"""
 <div style="max-width:700px;margin:0 auto;font-family:'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif;">
 
   <!-- 헤더 -->
-  <div style="background-color:#0f172a;border-radius:14px;padding:32px;text-align:center;margin-bottom:20px;">
-    <div style="font-size:28px;font-weight:900;color:#ffffff;">🎬 쿠대 쇼츠 제작 패키지</div>
-    <div style="font-size:13px;color:#94a3b8;margin-top:8px;">{today}</div>
-    <div style="display:inline-block;background-color:#6366f1;color:#ffffff;border-radius:20px;padding:6px 20px;font-size:13px;font-weight:700;margin-top:12px;">{topic_title}</div>
+  <div style="background-color:#0f172a;border-radius:14px;padding:28px;text-align:center;margin-bottom:20px;">
+    <div style="font-size:26px;font-weight:900;color:#ffffff;">🎬 쿠대 쇼츠 제작 패키지</div>
+    <div style="font-size:13px;color:#94a3b8;margin-top:6px;">{today}</div>
+    <div style="display:inline-block;background-color:#6366f1;color:#ffffff;border-radius:20px;padding:6px 20px;font-size:13px;font-weight:700;margin-top:10px;">{topic_title}</div>
   </div>
 
-  <!-- 안내 -->
-  <div style="background-color:#fffbeb;border-left:4px solid #e2b04a;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;">
-    <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;">📌 오늘 할 일 (10분)</div>
-    <div style="font-size:13px;color:#1e293b;line-height:1.8;">
-      1️⃣ 클링 프롬프트 복붙 → 영상 3개 생성 (각 5초)<br>
-      2️⃣ 나레이션 스크립트 → 클링 오디오 또는 GPT TTS<br>
-      3️⃣ 영상 합치기 → 15초 완성<br>
-      4️⃣ 유튜브 쇼츠 업로드
+  <!-- 할 일 -->
+  <div style="background-color:#fffbeb;border-left:4px solid #e2b04a;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:20px;">
+    <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:6px;">📌 오늘 할 일 (10분)</div>
+    <div style="font-size:13px;color:#1e293b;line-height:1.9;">
+      1️⃣ 클링 프롬프트 박스 전체 복붙 → 클링에 붙여넣기 → 영상 생성<br>
+      2️⃣ 레퍼런스 이미지 URL → 클링 Image-to-Video에 업로드<br>
+      3️⃣ 나레이션 텍스트 → 클링 오디오 입력<br>
+      4️⃣ 메타데이터 복붙 → 유튜브 업로드
     </div>
   </div>
 
-  <!-- 본문 -->
-  <div style="background-color:#f8fafc;border-radius:12px;padding:24px;white-space:pre-wrap;font-size:14px;color:#1e293b;line-height:1.9;">
-{content}
-  </div>
+  {box("클링 3.0 프롬프트 (전체 복붙)", "🎬", kling, "#0f172a")}
+  {box("레퍼런스 이미지", "🖼️", image, "#0369a1")}
+  {box("나레이션 스크립트", "🎙️", narr, "#7c3aed")}
+  {box("유튜브 메타데이터", "📱", meta, "#059669")}
+  {box("제작 팁", "💡", tip, "#d97706")}
 
   <!-- 푸터 -->
-  <div style="text-align:center;padding:20px;font-size:12px;color:#94a3b8;margin-top:16px;">
+  <div style="text-align:center;padding:20px;font-size:12px;color:#94a3b8;">
     🎬 쿠대 쇼츠 자동화 | Powered by Gemini + Claude | {today}
   </div>
 
