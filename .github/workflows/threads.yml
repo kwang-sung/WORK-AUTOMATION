@@ -1,0 +1,24 @@
+name: 스레드 자동 포스팅
+
+on:
+  schedule:
+    - cron: '50 0 * * *'   # 테스트: 오늘 KST 09:50
+  workflow_dispatch:
+
+jobs:
+  threads-posting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+      - name: 스레드 포스팅
+        run: python threads_poster.py
+        env:
+          ANTHROPIC_API_KEY:    ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          THREADS_USER_ID:      ${{ secrets.THREADS_USER_ID }}
