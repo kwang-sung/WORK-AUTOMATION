@@ -7,6 +7,7 @@ Gemini로 아이템 서치 → Claude가 스레드용 글 작성 → Threads API
 
 import os
 import json
+import time
 import requests
 import anthropic
 from google import genai
@@ -24,6 +25,10 @@ ANTHROPIC_API_KEY    = os.environ.get("ANTHROPIC_API_KEY", "")
 GEMINI_API_KEY       = os.environ.get("GEMINI_API_KEY", "")
 THREADS_ACCESS_TOKEN = os.environ.get("THREADS_ACCESS_TOKEN", "")
 THREADS_USER_ID      = os.environ.get("THREADS_USER_ID", "")
+THREADS_APP_ID       = os.environ.get("THREADS_APP_ID", "")
+THREADS_APP_SECRET   = os.environ.get("THREADS_APP_SECRET", "")
+GITHUB_TOKEN         = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO          = os.environ.get("GITHUB_REPOSITORY", "")  # 자동 주입됨
 
 # ─── 요일별 포스팅 주제 ───────────────────────────────────
 DAILY_TOPICS = {
@@ -35,6 +40,97 @@ DAILY_TOPICS = {
     5: ("국내 미출시 희소 아이템", "해외에서 인기지만 국내 정식 출시 안 된 희소 아이템. 선점 기회 있는 것"),
     6: ("이번 주 구매대행 총정리", "이번 주 가장 주목받은 구매대행 트렌드와 핵심 아이템 총정리"),
 }
+
+
+# ─── 0. 토큰 자동 갱신 ───────────────────────────────────
+def refresh_token_if_needed():
+    """
+    토큰 만료일 확인 후 7일 이내이면 자동 갱신
+    갱신된 토큰은 GitHub Secrets에 자동 업데이트
+    """
+    global THREADS_ACCESS_TOKEN
+
+    if not all([THREADS_APP_ID, THREADS_APP_SECRET, THREADS_ACCESS_TOKEN, GITHUB_TOKEN, GITHUB_REPO]):
+        print("  ⚠️  토큰 자동갱신 스킵 (환경변수 미설정)")
+        return
+
+    print("🔑 토큰 만료일 확인 중...")
+
+    try:
+        # 토큰 만료일 조회
+        resp = requests.get(
+            "https://graph.threads.net/access_token",
+            params={
+                "grant_type": "th_refresh_token",
+                "access_token": THREADS_ACCESS_TOKEN
+            }
+        )
+
+        if resp.status_code != 200:
+            print(f"  ⚠️  토큰 상태 확인 실패: {resp.text}")
+            # 실패해도 포스팅은 계속 진행
+            return
+
+        data = resp.json()
+        new_token = data.get("access_token")
+        expires_in = data.get("expires_in", 0)  # 초 단위
+
+        if not new_token:
+            print("  ⚠️  새 토큰 없음, 기존 토큰 유지")
+            return
+
+        days_left = expires_in // 86400
+        print(f"  📅 토큰 만료까지 {days_left}일 남음")
+
+        # 7일 이내면 갱신
+        if days_left <= 7:
+            print(f"  🔄 토큰 갱신 중... (만료 {days_left}일 전)")
+            THREADS_ACCESS_TOKEN = new_token
+            update_github_secret("THREADS_ACCESS_TOKEN", new_token)
+            print("  ✅ 토큰 갱신 및 GitHub Secrets 업데이트 완료!")
+        else:
+            print(f"  ✅ 토큰 정상 (만료까지 {days_left}일)")
+
+    except Exception as e:
+        print(f"  ⚠️  토큰 갱신 중 오류: {e}")
+        # 오류가 나도 포스팅은 계속 진행
+
+
+def update_github_secret(secret_name: str, secret_value: str):
+    """GitHub Secrets 자동 업데이트"""
+    try:
+        from base64 import b64encode
+        from nacl import encoding, public
+
+        headers = {
+            "Authorization": f"token {GITHUB_TOKEN}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+
+        # 공개키 조회
+        pub_key_resp = requests.get(
+            f"https://api.github.com/repos/{GITHUB_REPO}/actions/secrets/public-key",
+            headers=headers
+        )
+        pub_key_data = pub_key_resp.json()
+        pub_key = pub_key_data["key"]
+        key_id  = pub_key_data["key_id"]
+
+        # 값 암호화
+        public_key = public.PublicKey(pub_key.encode("utf-8"), encoding.Base64Encoder())
+        sealed_box = public.SealedBox(public_key)
+        encrypted  = sealed_box.encrypt(secret_value.encode("utf-8"))
+        encrypted_value = b64encode(encrypted).decode("utf-8")
+
+        # Secrets 업데이트
+        requests.put(
+            f"https://api.github.com/repos/{GITHUB_REPO}/actions/secrets/{secret_name}",
+            headers=headers,
+            json={"encrypted_value": encrypted_value, "key_id": key_id}
+        )
+
+    except Exception as e:
+        print(f"  ⚠️  GitHub Secrets 업데이트 실패: {e}")
 
 
 # ─── 1. Gemini로 아이템 서치 ──────────────────────────────
@@ -119,7 +215,6 @@ def post_to_threads(text: str) -> bool:
     print(f"  ✅ 컨테이너 생성: {container_id}")
 
     # 컨테이너 준비 대기
-    import time
     print("  ⏳ 컨테이너 준비 중... (30초 대기)")
     time.sleep(30)
 
@@ -153,6 +248,9 @@ def main():
     print("🧵 쿠대 스레드 자동 포스팅 시작")
     print(f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 55)
+
+    # 0. 토큰 자동 갱신 체크
+    refresh_token_if_needed()
 
     # 오늘 요일 주제
     weekday_num = datetime.now().weekday()
