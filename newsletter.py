@@ -335,12 +335,12 @@ HTML: {html[:3000]}
             contents=f"다음 AI 뉴스 수치/스펙 정보가 정확한지 검증하세요.\n검증항목:\n{claims}\n형식: '항목명 | 원래수치 | 수정수치 | 판정(정확/수정필요)'",
             config=types.GenerateContentConfig(tools=[types.Tool(google_search=types.GoogleSearch())])
         )
-        verification = verify_resp.text
+        verification = verify_resp.text or ""
     except Exception as e:
         print(f"  ⚠️  팩트 검증 실패: {e}")
         return html
 
-    if "수정필요" not in verification:
+    if not verification or "수정필요" not in verification:
         print(f"  ✅ {label} 팩트 검증 통과")
         return html
 
