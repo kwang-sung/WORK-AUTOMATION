@@ -230,10 +230,12 @@ def generate_content(news_text: str) -> tuple:
 5. 💡 이커머스·구매대행 AI 활용 팁 3가지
 6. 🤖 쿠대 활용 TIP - 뉴스 2번째 카드 뒤에 아래 HTML 삽입:
 {CTA_CAFE}
-7. 🏄 쿠대 마스터 총평
-   - "안녕하세요, 쿠대 마스터입니다." 로 시작
-   - AI 트렌드 인사이트 4~5문장, 구매대행 관점 조언
-   - "다음 주에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리
+7. 🏄 쿠대 마스터 총평 - 아래 HTML 구조를 그대로 사용하고 [총평내용] 부분만 작성:
+<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;">
+<tr><td style="background-color:#0f172a;padding:28px;">
+<p style="font-size:16px;font-weight:800;color:#818cf8;margin:0 0 14px 0;">🏄 쿠대 마스터 총평</p>
+<p style="font-size:14px;color:#e2e8f0;line-height:1.9;margin:0;">[총평내용 - "안녕하세요, 쿠대 마스터입니다." 로 시작, AI 트렌드 인사이트 4~5문장, 구매대행 관점 조언, "다음 주에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리]</p>
+</td></tr></table>
 8. 하단 SNS 배너 (아래 HTML 그대로 삽입):
 {CAFE_SNS_BANNER}
 9. 푸터
@@ -249,9 +251,6 @@ def generate_content(news_text: str) -> tuple:
 - 뉴스카드: background-color #ffffff, border 1px solid #e2e8f0, border-left 4px solid #6366f1, border-radius 12px, padding 22px, margin-bottom 14px
 - 카드제목: font-size 16px, font-weight 800, color #0f172a / 카드본문: font-size 14px, color #334155, line-height 1.9
 - 시사점박스: background-color #f0f4ff, border-radius 8px, padding 12px 16px, margin-top 10px, font-size 13px, color #3730a3
-- 쿠대마스터총평: background-color #0f172a, border-radius 14px, padding 28px, margin-top 24px
-- 총평제목: font-size 16px, font-weight 800, color #818cf8, margin-bottom 14px
-- 총평본문: font-size 14px, color #e2e8f0, line-height 1.9
 - 푸터: text-align center, padding 20px, font-size 12px, color #94a3b8
 이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
@@ -272,10 +271,12 @@ def generate_content(news_text: str) -> tuple:
 5. 🛠️ 주목할 AI 모델·도구 2~3개 (상세 스펙, 실무 활용법)
 6. 💼 구매대행·이커머스 AI 실무 전략 4~5가지 - 중간에 아래 HTML 삽입:
 {CTA_BLOG}
-7. 🏄 쿠대 마스터 총평
-   - "안녕하세요, AI·구매대행 전문가 쿠대 마스터입니다." 로 시작
-   - 전문가 분석 5~6문장, 구체적 실행 제안
-   - "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
+7. 🏄 쿠대 마스터 총평 - 아래 HTML 구조를 그대로 사용하고 [총평내용] 부분만 작성:
+<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:28px;">
+<tr><td style="background-color:#0f172a;padding:30px;">
+<p style="font-size:17px;font-weight:800;color:#818cf8;margin:0 0 16px 0;">🏄 쿠대 마스터 총평</p>
+<p style="font-size:15px;color:#e2e8f0;line-height:2.0;margin:0;">[총평내용 - "안녕하세요, AI·구매대행 전문가 쿠대 마스터입니다." 로 시작, 전문가 분석 5~6문장, 구체적 실행 제안, "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리]</p>
+</td></tr></table>
 8. 태그 (#AI트렌드 #구매대행 #이커머스자동화 등 10개)
 9. 하단 SNS 배너 (아래 HTML 그대로 삽입):
 {BLOG_SNS_BANNER}
@@ -292,9 +293,6 @@ def generate_content(news_text: str) -> tuple:
 - 뉴스카드: background-color #ffffff, border 1px solid #e2e8f0, border-left 5px solid #6366f1, border-radius 12px, padding 24px, margin-bottom 16px
 - 카드제목: font-size 18px, font-weight 800, color #0f172a / 카드본문: font-size 14px, color #334155, line-height 2.0
 - 시사점박스: background-color #f0f4ff, border-radius 8px, padding 14px 18px, margin-top 12px, font-size 13px, color #3730a3
-- 쿠대마스터총평: background-color #0f172a, border-radius 14px, padding 30px, margin-top 28px
-- 총평제목: font-size 17px, font-weight 800, color #818cf8, margin-bottom 16px
-- 총평본문: font-size 15px, color #e2e8f0, line-height 2.0
 - 태그: display inline-block, background-color #f1f5f9, color #475569, border-radius 20px, padding 4px 12px, font-size 12px, margin 4px
 - 푸터: text-align center, padding 20px, font-size 12px, color #94a3b8 / "🤖 골든서퍼 AI 위클리 | Powered by Gemini + Claude | {today}"
 이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
