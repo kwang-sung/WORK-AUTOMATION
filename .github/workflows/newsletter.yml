@@ -1,5 +1,4 @@
 name: 골든서퍼 뉴스레터 자동화
-
 on:
   schedule:
     - cron: '30 0 * * 1'   # AI 위클리: 매주 월요일 KST 09:30
@@ -15,7 +14,6 @@ on:
           - ai_weekly
           - purchasing_insight
           - both
-
 jobs:
   send-newsletter:
     runs-on: ubuntu-latest
@@ -26,7 +24,6 @@ jobs:
           python-version: '3.11'
       - name: 의존성 설치
         run: pip install -r requirements.txt
-
       - name: AI 위클리 (월요일)
         if: |
           (github.event_name == 'schedule' && github.event.schedule == '30 0 * * 1') ||
@@ -38,7 +35,6 @@ jobs:
           GMAIL_USER:        ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
-
       - name: 골든서퍼 인사이트 (월·목)
         if: |
           (github.event_name == 'schedule' && (github.event.schedule == '30 0 * * 1' || github.event.schedule == '30 0 * * 4')) ||
