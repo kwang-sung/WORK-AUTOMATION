@@ -345,12 +345,12 @@ HTML: {html[:3000]}
             contents=f"다음 구매대행 마진율/수치가 현실적으로 맞는지 검증하세요.\n검증항목:\n{claims}\n형식: '아이템명 | 원래수치 | 수정수치 | 판정(정확/수정필요)'",
             config=types.GenerateContentConfig(tools=[types.Tool(google_search=types.GoogleSearch())])
         )
-        verification = verify_resp.text
+        verification = verify_resp.text or ""
     except Exception as e:
         print(f"  ⚠️  팩트 검증 실패: {e}")
         return html
 
-    if "수정필요" not in verification:
+    if not verification or "수정필요" not in verification:
         print(f"  ✅ {label} 팩트 검증 통과")
         return html
 
