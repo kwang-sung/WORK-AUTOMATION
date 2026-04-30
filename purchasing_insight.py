@@ -57,13 +57,31 @@ CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="
 <tr><td style="padding:6px 0;">📝 블로그 &nbsp;<a href="https://blog.naver.com/gngsun" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 </table>"""
 
-BLOG_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;border-top:2px solid #e2e8f0;">
-<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">🔗 쿠대 공식채널</p></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">💬 카톡단체방 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">☕ 카페 &nbsp;<a href="https://cafe.naver.com/coudae" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">🧵 스레드 &nbsp;<a href="https://www.threads.com/@coudae_official" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;">▶ 유튜브 &nbsp;<a href="https://www.youtube.com/@coudae" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-</table>"""
+BLOG_SNS_BANNER = """<div style="margin:24px 0;">
+  <div style="font-size:13px;font-weight:800;color:#1e293b;margin-bottom:12px;">🔗 쿠대 공식채널</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <a href="https://open.kakao.com/o/gKWnrBDg" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#fee500;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3c1e1e;font-size:14px;font-weight:800;flex-shrink:0;">💬</div>
+      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">카톡단체방</div><div style="font-size:11px;color:#64748b;margin-top:2px;">실시간 소싱 정보 공유</div></div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+    <a href="https://cafe.naver.com/coudae" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#03c75a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;">N</div>
+      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">카페</div><div style="font-size:11px;color:#64748b;margin-top:2px;">회원 18,000명 커뮤니티</div></div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+    <a href="https://www.threads.com/@coudae_official" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#ffffff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#000;font-size:14px;font-weight:800;flex-shrink:0;">@</div>
+      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">스레드</div><div style="font-size:11px;color:#64748b;margin-top:2px;">일상 인사이트 팔로우</div></div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+    <a href="https://www.youtube.com/@coudae" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
+      <div style="width:34px;height:34px;background-color:#cc0000;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;">▶</div>
+      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">유튜브</div><div style="font-size:11px;color:#64748b;margin-top:2px;">구매대행 실전 노하우</div></div>
+      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
+    </a>
+  </div>
+</div>"""
 
 
 # ─── 0. 발행 이력 관리 ────────────────────────────────────
@@ -169,8 +187,8 @@ def generate_content(news_text: str) -> tuple:
     <div style="font-size:15px;font-weight:800;color:#1e293b;">쿠대 프로그램 — 지금 무료로 시작하세요</div>
     <div style="font-size:12px;color:#64748b;margin-top:3px;">구매대행 자동화의 시작 · 누적회원 15,900명</div>
   </div>
-  <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
-    <a href="https://admin.coudae.kr/#/login" style="background-color:#e2b04a;color:#1a1a2e;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료 시작 →</a>
+  <div style="flex-shrink:0;margin-left:auto;">
+    <a href="https://www.coudae.io/" style="background-color:#e2b04a;color:#1a1a2e;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료 시작 →</a>
   </div>
 </div>"""
 
@@ -180,7 +198,9 @@ def generate_content(news_text: str) -> tuple:
     <div style="font-size:16px;font-weight:800;color:#ffffff;">쿠대 — 구매대행 자동화 프로그램</div>
     <div style="font-size:12px;color:#94a3b8;margin-top:4px;">상품 등록·가격 모니터링·주문 관리 자동화 · 누적회원 15,900명</div>
   </div>
-  <a href="https://admin.coudae.kr/#/login" style="background-color:#6366f1;color:#ffffff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료로 시작하기 →</a>
+  <div style="flex-shrink:0;margin-left:auto;">
+    <a href="https://www.coudae.io/" style="background-color:#6366f1;color:#ffffff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료로 시작하기 →</a>
+  </div>
 </div>"""
 
     cafe_prompt = f"""
@@ -243,12 +263,13 @@ def generate_content(news_text: str) -> tuple:
 6. 📢 플랫폼·정책 업데이트
 7. 🤖 AI·자동화 활용 전략 - 중간에 아래 HTML 삽입:
 {CTA_BLOG}
-8. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 텍스트만 교체할 것. div 사용 절대 금지:
-<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:28px;">
-<tr><td style="background-color:#0f2744;padding:30px;">
-<p style="font-size:17px;font-weight:800;color:#e2b04a;margin:0 0 16px 0;">🏄 쿠대 마스터 총평</p>
-<p style="font-size:15px;color:#e2e8f0;line-height:2.0;margin:0;">"안녕하세요, 구매대행 전문가 쿠대 마스터입니다." 로 시작하는 전문가 분석 5~6문장과 구체적 실행 제안, "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리하는 내용을 여기에 작성</p>
-</td></tr></table>
+8. 🏄 쿠대 마스터 총평
+   - "안녕하세요, 구매대행 전문가 쿠대 마스터입니다." 로 시작
+   - 전문가 분석 5~6문장, 구체적 실행 제안
+   - "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
+   - 디자인: background-color #0f2744, border-radius 14px, padding 30px, margin-top 28px
+   - 총평제목: font-size 17px, font-weight 800, color #e2b04a
+   - 총평본문: font-size 15px, color #e2e8f0, line-height 2.0
 9. 태그 (#구매대행 #해외직구 등 10개)
 10. 하단 SNS 배너 (아래 HTML 그대로 삽입):
 {BLOG_SNS_BANNER}
