@@ -1,0 +1,26 @@
+name: 쿠대 자동화 업무 — 구매대행 인사이트
+
+on:
+  schedule:
+    - cron: '30 0 * * 1'   # 매주 월요일 KST 09:30
+    - cron: '30 0 * * 4'   # 매주 목요일 KST 09:30
+  workflow_dispatch:
+
+jobs:
+  purchasing-insight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+      - name: 구매대행 인사이트 실행
+        run: python purchasing_insight.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
+          GMAIL_USER:        ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PW:      ${{ secrets.GMAIL_APP_PW }}
+          RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
