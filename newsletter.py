@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-골든서퍼 AI 위클리 - 매주 월요일 09:00 자동 실행
+쿠대 마스터 AI 위클리 - 매주 월요일 09:00 자동 실행
 
 메일 2통 발송:
 1. 카페용 - 친근한 톤 + 쿠대 마스터 총평
@@ -54,31 +54,14 @@ CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="
 <tr><td style="padding:6px 0;">📝 블로그 &nbsp;<a href="https://blog.naver.com/gngsun" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 </table>"""
 
-BLOG_SNS_BANNER = """<div style="margin:24px 0;">
-  <div style="font-size:13px;font-weight:800;color:#1e293b;margin-bottom:12px;">🔗 쿠대 공식채널</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-    <a href="https://open.kakao.com/o/gKWnrBDg" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
-      <div style="width:34px;height:34px;background-color:#fee500;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3c1e1e;font-size:14px;font-weight:800;flex-shrink:0;">💬</div>
-      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">카톡단체방</div><div style="font-size:11px;color:#64748b;margin-top:2px;">실시간 소싱 정보 공유</div></div>
-      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
-    </a>
-    <a href="https://cafe.naver.com/coudae" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
-      <div style="width:34px;height:34px;background-color:#03c75a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;">N</div>
-      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">카페</div><div style="font-size:11px;color:#64748b;margin-top:2px;">회원 18,000명 커뮤니티</div></div>
-      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
-    </a>
-    <a href="https://www.threads.com/@coudae_official" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
-      <div style="width:34px;height:34px;background-color:#ffffff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#000;font-size:14px;font-weight:800;flex-shrink:0;">@</div>
-      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">스레드</div><div style="font-size:11px;color:#64748b;margin-top:2px;">일상 인사이트 팔로우</div></div>
-      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
-    </a>
-    <a href="https://www.youtube.com/@coudae" style="background-color:#0f172a;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:10px;border:1px solid #1e293b;text-decoration:none;">
-      <div style="width:34px;height:34px;background-color:#cc0000;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;">▶</div>
-      <div><div style="font-size:13px;font-weight:800;color:#ffffff;">유튜브</div><div style="font-size:11px;color:#64748b;margin-top:2px;">구매대행 실전 노하우</div></div>
-      <div style="margin-left:auto;color:#e2b04a;font-weight:800;">→</div>
-    </a>
-  </div>
-</div>"""
+BLOG_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;border-top:2px solid #e2e8f0;">
+<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">🔗 쿠대 공식채널</p></td></tr>
+<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">💬 카톡단체방 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
+<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">🧵 스레드 &nbsp;<a href="https://www.threads.com/@coudae_official" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
+<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">▶ 유튜브 &nbsp;<a href="https://www.youtube.com/@coudae" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
+<tr><td style="padding:6px 0;">☕ 카페 &nbsp;<a href="https://cafe.naver.com/coudae" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
+</table>"""
+
 
 
 # ─── 0. 발행 이력 관리 ────────────────────────────────────
@@ -170,6 +153,7 @@ def remove_duplicates(news_text: str, history: dict) -> str:
     return resp.content[0].text.strip()
 
 
+
 # ─── 3. Claude 글쓰기 ─────────────────────────────────────
 def generate_content(news_text: str) -> tuple:
     client    = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -198,6 +182,18 @@ def generate_content(news_text: str) -> tuple:
   </div>
 </div>"""
 
+    CAFE_REVIEW_TABLE = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;">
+<tr><td style="background-color:#0f172a;padding:28px;">
+<p style="font-size:16px;font-weight:800;color:#818cf8;margin:0 0 14px 0;">🏄 쿠대 마스터 총평</p>
+<p style="font-size:14px;color:#e2e8f0;line-height:1.9;margin:0;">[총평내용]</p>
+</td></tr></table>"""
+
+    BLOG_REVIEW_TABLE = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;">
+<tr><td style="background-color:#0f172a;padding:28px;">
+<p style="font-size:16px;font-weight:800;color:#818cf8;margin:0 0 14px 0;">🏄 쿠대 마스터 총평</p>
+<p style="font-size:14px;color:#e2e8f0;line-height:1.9;margin:0;">[총평내용]</p>
+</td></tr></table>"""
+
     cafe_prompt = f"""
 당신은 AI 트렌드를 구매대행 관점에서 전달하는 카페 운영자 쿠대 마스터입니다.
 오늘은 {today}입니다. 카페 회원 18,000명에게 올릴 친근하고 실용적인 글을 작성하세요.
@@ -207,7 +203,7 @@ def generate_content(news_text: str) -> tuple:
 =====================
 
 ## 구성
-1. 헤더 배너 (골든서퍼 AI 위클리 #{issue_num} / {today})
+1. 헤더 배너 (쿠대 마스터 AI 위클리 #{issue_num} / {today})
 2. 이번 주 핵심 요약 박스 (3가지)
 3. 🤖 주요 AI 뉴스 4~5개 (친근한 말투, 5~6문장, 구매대행 관점 시사점)
 4. 🛠️ 주목할 AI 도구 2~3개 (실무 활용법 구체적으로)
@@ -215,11 +211,8 @@ def generate_content(news_text: str) -> tuple:
 6. 🤖 쿠대 활용 TIP - 뉴스 2번째 카드 뒤에 아래 HTML 삽입:
 {CTA_CAFE}
 7. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
-<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;">
-<tr><td style="background-color:#0f172a;padding:28px;">
-<p style="font-size:16px;font-weight:800;color:#818cf8;margin:0 0 14px 0;">🏄 쿠대 마스터 총평</p>
-<p style="font-size:14px;color:#e2e8f0;line-height:1.9;margin:0;">"안녕하세요, 쿠대 마스터입니다." 로 시작하는 AI 트렌드 인사이트 4~5문장과 구매대행 관점 조언, "다음 주에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리하는 내용을 여기에 작성</p>
-</td></tr></table>
+{CAFE_REVIEW_TABLE}
+"안녕하세요, 쿠대 마스터입니다." 로 시작하는 AI 트렌드 인사이트 4~5문장과 구매대행 관점 조언, "다음 주에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리
 8. 하단 SNS 배너 (아래 HTML 그대로 삽입):
 {CAFE_SNS_BANNER}
 9. 푸터
@@ -248,20 +241,16 @@ def generate_content(news_text: str) -> tuple:
 =====================
 
 ## 구성
-1. 헤더 배너 (골든서퍼 AI 위클리 #{issue_num} / {today})
+1. 헤더 배너 (쿠대 마스터 AI 위클리 #{issue_num} / {today})
 2. 목차 박스
 3. 서론 (AI 트렌드 검색 키워드 포함, 3~4문장)
 4. 🤖 주요 AI 뉴스 4~5개 (SEO 키워드, 7~8문장, 데이터·수치, 구매대행 시사점)
 5. 🛠️ 주목할 AI 모델·도구 2~3개 (상세 스펙, 실무 활용법)
 6. 💼 구매대행·이커머스 AI 실무 전략 4~5가지 - 중간에 아래 HTML 삽입:
 {CTA_BLOG}
-7. 🏄 쿠대 마스터 총평
-   - "안녕하세요, AI·구매대행 전문가 쿠대 마스터입니다." 로 시작
-   - 전문가 분석 5~6문장, 구체적 실행 제안
-   - "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
-   - 디자인: background-color #0f172a, border-radius 14px, padding 30px, margin-top 28px
-   - 총평제목: font-size 17px, font-weight 800, color #818cf8
-   - 총평본문: font-size 15px, color #e2e8f0, line-height 2.0
+7. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
+{BLOG_REVIEW_TABLE}
+"안녕하세요, AI·구매대행 전문가 쿠대 마스터입니다." 로 시작하는 전문가 분석 5~6문장과 구체적 실행 제안, "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
 8. 태그 (#AI트렌드 #구매대행 #이커머스자동화 등 10개)
 9. 하단 SNS 배너 (아래 HTML 그대로 삽입):
 {BLOG_SNS_BANNER}
@@ -279,7 +268,7 @@ def generate_content(news_text: str) -> tuple:
 - 카드제목: font-size 18px, font-weight 800, color #0f172a / 카드본문: font-size 14px, color #334155, line-height 2.0
 - 시사점박스: background-color #f0f4ff, border-radius 8px, padding 14px 18px, margin-top 12px, font-size 13px, color #3730a3
 - 태그: display inline-block, background-color #f1f5f9, color #475569, border-radius 20px, padding 4px 12px, font-size 12px, margin 4px
-- 푸터: text-align center, padding 20px, font-size 12px, color #94a3b8 / "🤖 골든서퍼 AI 위클리 | Powered by Gemini + Claude | {today}"
+- 푸터: text-align center, padding 20px, font-size 12px, color #94a3b8
 이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
 
@@ -294,6 +283,7 @@ def generate_content(news_text: str) -> tuple:
         messages=[{"role": "user", "content": blog_prompt}]
     )
     return cafe_resp.content[0].text, blog_resp.content[0].text
+
 
 
 # ─── 4. 팩트 검증 및 자동 수정 ───────────────────────────
@@ -372,7 +362,7 @@ def send_email(html: str, subject: str) -> bool:
     msg["Subject"] = subject
     msg["From"]    = GMAIL_USER
     msg["To"]      = RECIPIENT_EMAIL
-    msg.attach(MIMEText("골든서퍼 AI 위클리", "plain", "utf-8"))
+    msg.attach(MIMEText("쿠대 마스터 AI 위클리", "plain", "utf-8"))
     msg.attach(MIMEText(html, "html", "utf-8"))
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
@@ -396,7 +386,7 @@ def save_preview(html: str, prefix: str):
 # ─── 메인 ─────────────────────────────────────────────────
 def main():
     print("=" * 55)
-    print("🤖 골든서퍼 AI 위클리 시작")
+    print("🤖 쿠대 마스터 AI 위클리 시작")
     print(f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 55)
 
@@ -426,8 +416,8 @@ def main():
 
     today = datetime.now().strftime("%Y년 %m월 %d일")
     print("\n📧 메일 발송 중...")
-    send_email(cafe_html, f"☕ [카페용] 골든서퍼 AI 위클리 | {today}")
-    send_email(blog_html, f"📝 [블로그용] 골든서퍼 AI 위클리 | {today}")
+    send_email(cafe_html, f"☕ [카페용] 쿠대 마스터 AI 위클리 | {today}")
+    send_email(blog_html, f"📝 [블로그용] 쿠대 마스터 AI 위클리 | {today}")
 
     print("\n💾 발행 이력 저장 중...")
     save_history(history, new_items, new_topics)
