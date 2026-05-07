@@ -263,13 +263,6 @@ def generate_content(news_text: str) -> tuple:
 이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
 
-    print("  ✍️  요약본 작성 중...")
-    summary_resp = client.messages.create(
-        model="claude-sonnet-4-5",
-        max_tokens=3000,
-        messages=[{"role": "user", "content": summary_prompt}]
-    )
-
     print("  ✍️  카페용 작성 중...")
     cafe_resp = client.messages.create(
         model="claude-sonnet-4-5",
