@@ -2,7 +2,7 @@ name: 쿠대 자동화 업무 — 스레드
 
 on:
   schedule:
-    - cron: '0 11 * * *'   # 매일 KST 20:00
+    - cron: '0 9 * * *'    # 매일 KST 18:00 (GitHub Actions 큐 지연 감안)
   workflow_dispatch:
 
 jobs:
