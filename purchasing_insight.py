@@ -87,6 +87,7 @@ def save_history(history: dict, new_items: list, new_topics: list):
     try:
         history["items"]  = (history.get("items",  []) + new_items)[-40:]
         history["topics"] = (history.get("topics", []) + new_topics)[-40:]
+        history["last_sent"] = datetime.now().strftime('%Y-%m-%d')
         headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
         content = base64.b64encode(json.dumps(history, ensure_ascii=False, indent=2).encode()).decode()
         sha = None
@@ -474,6 +475,12 @@ def main():
     print("\n📂 발행 이력 로드 중...")
     history = load_history()
     print(f"   이전 항목 {len(history.get('items',[]))}개 / 토픽 {len(history.get('topics',[]))}개")
+
+    today_key = datetime.now().strftime('%Y-%m-%d')
+    if history.get("last_sent") == today_key:
+        print(f"\n⚠️  오늘({today_key}) 이미 발행 완료 — 중복 실행 차단")
+        print("=" * 55)
+        return
 
     print("\n📡 Gemini 뉴스 수집 중...")
     news_text = collect_news()

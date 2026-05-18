@@ -6,6 +6,10 @@ on:
     - cron: '30 0 * * 4'   # 매주 목요일 KST 09:30
   workflow_dispatch:
 
+concurrency:
+  group: purchasing-insight
+  cancel-in-progress: false
+
 jobs:
   purchasing-insight:
     runs-on: ubuntu-latest

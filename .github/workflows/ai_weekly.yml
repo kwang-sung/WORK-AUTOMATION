@@ -5,6 +5,10 @@ on:
     - cron: '30 0 * * 1'   # 매주 월요일 KST 09:30
   workflow_dispatch:
 
+concurrency:
+  group: ai-weekly
+  cancel-in-progress: false
+
 jobs:
   ai-weekly:
     runs-on: ubuntu-latest
