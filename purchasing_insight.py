@@ -39,14 +39,19 @@ GITHUB_REPO       = os.environ.get("GITHUB_REPOSITORY", "")
 HISTORY_FILE      = "data/insight_history.json"
 
 SEARCH_QUERIES = [
-    "구매대행 최신 트렌드 아이템 2026 국내",
-    "해외직구 인기상품 트렌드 2026 이번주",
-    "일본 인기 상품 트렌드 2026 소싱 한국",
-    "Japan trending products ecommerce 2026",
-    "쿠팡 네이버 스마트스토어 구매대행 정책 2026",
-    "해외 이커머스 배송 관세 정책 변경 2026",
-    "국내 미출시 해외 인기 상품 아이템 2026",
-    "Super Delivery Yodobashi trending items Korea 2026",
+    # (레이어,             검색 쿼리)
+    # 전술: 뭘 팔까
+    ("전술|소싱아이템",    "지금 잘 팔리는 트렌드 소싱 아이템 구매대행 추천 2026"),
+    ("전술|소싱아이템",    "국내 미출시 해외 인기 상품 아이템 소싱 기회 2026"),
+    ("전술|소싱아이템",    "일본 해외 소싱 추천 아이템 트렌드 2026"),
+    # 전술: 어디서 팔까 / 마진이 남나
+    ("전술|플랫폼마진",    "쿠팡 네이버 스마트스토어 수수료 정책 노출 알고리즘 변경 2026"),
+    # 전략: 방향 잡기
+    ("전략|플랫폼방향",    "이커머스 플랫폼 경쟁 전략 쿠팡 네이버 11번가 알리 쉬인 2026"),
+    ("전략|소싱환경",      "글로벌 소싱 환경 변화 미국 일본 중국 직구 역직구 2026"),
+    ("전략|소비트렌드",    "소비자 트렌드 변화 1인가구 시니어 반려동물 이커머스 2026"),
+    # 리스크: 변화 있을 때만
+    ("리스크|규정변경",    "관세 통관 직구 규정 변경 이커머스 셀러 2026"),
 ]
 
 CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;border-top:2px solid #e2e8f0;">
@@ -107,7 +112,7 @@ def save_history(history: dict, new_items: list, new_topics: list):
 def collect_news() -> str:
     client = genai.Client(api_key=GEMINI_API_KEY)
     collected = []
-    for query in SEARCH_QUERIES:
+    for layer, query in SEARCH_QUERIES:
         try:
             resp = client.models.generate_content(
                 model="gemini-2.5-flash",
@@ -116,8 +121,8 @@ def collect_news() -> str:
                     tools=[types.Tool(google_search=types.GoogleSearch())]
                 )
             )
-            collected.append(f"[{query}]\n{resp.text}")
-            print(f"    ✅ {query[:45]}...")
+            collected.append(f"[{layer}]\n{resp.text}")
+            print(f"    ✅ [{layer}] {query[:40]}...")
         except Exception as e:
             print(f"    ⚠️  실패: {e}")
     return "\n\n---\n\n".join(collected)
@@ -201,7 +206,13 @@ def generate_content(news_text: str) -> tuple:
     cafe_prompt = f"""
 당신은 구매대행 카페 '쿠대' 운영자 쿠대 마스터입니다.
 오늘은 {today}({weekday}요일)입니다.
-카페 회원들에게 올릴 친근하고 실전적인 글을 작성하세요.
+재고 없이 국내위탁·해외위탁으로 판매하는 셀러들에게 실전 도움이 되는 글을 작성하세요.
+
+수집 정보의 각 섹션은 레이어로 분류되어 있습니다:
+- [전술|소싱아이템]: 지금 당장 뭘 팔까
+- [전술|플랫폼마진]: 어디서 팔까 / 마진이 남나
+- [전략|*]: 다음 달·분기 방향 잡기
+- [리스크|규정변경]: 놓치면 손해 보는 규정 변화
 
 ===== 수집 정보 =====
 {news_text}
@@ -209,25 +220,30 @@ def generate_content(news_text: str) -> tuple:
 
 ## 구성
 1. 헤더 배너 (쿠대 마스터 인사이트 #{issue_num} / {today})
-2. 이번 호 핵심 요약 박스 (3가지)
-3. 🇰🇷 국내 구매대행 트렌드 3개
-   - 친근한 말투로 설명 5~6문장
-   - 실전 적용 팁 3가지
-   - 주의사항 1~2가지
-4. 🌏 해외 소싱 추천 아이템 3~4개
-   - 아이템 설명 5~6문장
-   - 소싱 방법 (구체적 사이트명)
-   - 예상 마진율
-   - 주의사항
-5. 📢 플랫폼·정책 업데이트
-6. 🤖 쿠대 활용 TIP - 트렌드 2번째 카드 뒤에 아래 HTML을 그대로 삽입:
+2. 이번 호 핵심 요약 박스 (3가지 — 전술·전략·리스크 각 1개씩)
+3. 📌 이번 주 소싱 기회 — "뭘 팔까?" [전술|소싱아이템]
+   - 트렌딩 아이템 3~4개
+   - 아이템별: 왜 지금 팔리는지 3~4문장, 소싱처 (구체적 사이트명), 예상 마진율, 주의사항
+   - 실전 소싱 팁 박스
+4. 🛒 플랫폼 & 마진 체크 — "어디서 팔까? 마진이 남나?" [전술|플랫폼마진]
+   - 플랫폼 정책·수수료·노출 변화 핵심만
+   - 셀러 입장 실전 적용법 3가지
+5. 쿠대 활용 TIP - 아래 HTML을 그대로 삽입:
 {CTA_CAFE}
-7. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
+6. 🔭 전략 시그널 — "다음 달·분기를 준비한다" [전략|*]
+   - 플랫폼 세력 변화: 어디에 힘을 실어야 하는가
+   - 글로벌 소싱 환경: 미국·일본·중국 소싱 유불리 변화
+   - 소비자 구조 변화: 어떤 카테고리가 커지는가
+   - 각 항목별 셀러 액션 포인트 1줄씩
+7. ⚠️ 리스크 알림 [리스크|규정변경]
+   - 이번 주 관세·통관·규정 변화가 있으면: 핵심 내용 + 셀러 주의사항
+   - 이번 주 주요 변경 없으면: "이번 주 규정 변경 없음 ✅" 한 줄로 표시
+8. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
 {CAFE_REVIEW_TABLE}
-"안녕하세요, 쿠대 마스터입니다." 로 시작하는 이번 주 전체를 아우르는 인사이트 4~5문장, "다음에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리
-8. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
+"안녕하세요, 쿠대 마스터입니다." 로 시작 — 전술(당장 팔 것)과 전략(방향) 두 가지를 연결하는 인사이트 4~5문장, "다음에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리
+9. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
 {CAFE_SNS_BANNER}
-9. 푸터
+10. 푸터
 
 ## 디자인 (카페 복붙 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
@@ -253,15 +269,20 @@ def generate_content(news_text: str) -> tuple:
 
 ### 뉴스카드
 - background-color #ffffff, border 1px solid #e2e8f0, border-radius 12px, padding 22px, margin-bottom 14px
-- 국내: border-top 4px solid #3b82f6
-- 해외: border-top 4px solid #10b981
-- 플랫폼: border-top 4px solid #f59e0b
+- 소싱아이템: border-top 4px solid #10b981
+- 플랫폼마진: border-top 4px solid #f59e0b
+- 전략: border-top 4px solid #3b82f6
+- 리스크: border-top 4px solid #ef4444
 - 카드제목: font-size 16px, font-weight 800, color #0f172a, margin-bottom 10px
 - 카드본문: font-size 14px, color #334155, line-height 1.9
 
 ### 실전팁박스
 - background-color #f0fdf4, border-radius 8px, padding 14px 18px, margin-top 10px
 - font-size 13px, color #166534, line-height 1.8
+
+### 액션포인트박스 (전략 섹션용)
+- background-color #eff6ff, border-radius 8px, padding 14px 18px, margin-top 10px
+- font-size 13px, color #1e40af, line-height 1.8
 
 ### 마진뱃지
 - display inline-block, background-color #dcfce7, color #166534
@@ -277,7 +298,13 @@ def generate_content(news_text: str) -> tuple:
     blog_prompt = f"""
 당신은 구매대행 전문 블로그 에디터 쿠대 마스터입니다.
 오늘은 {today}({weekday}요일)입니다.
-네이버 블로그 SEO에 최적화된 전문 콘텐츠를 작성하세요.
+재고 없이 국내위탁·해외위탁으로 판매하는 셀러를 독자로, 네이버 블로그 SEO에 최적화된 전문 콘텐츠를 작성하세요.
+
+수집 정보의 각 섹션은 레이어로 분류되어 있습니다:
+- [전술|소싱아이템]: 지금 당장 뭘 팔까
+- [전술|플랫폼마진]: 어디서 팔까 / 마진이 남나
+- [전략|*]: 다음 달·분기 방향 잡기
+- [리스크|규정변경]: 놓치면 손해 보는 규정 변화
 
 ===== 수집 정보 =====
 {news_text}
@@ -285,28 +312,31 @@ def generate_content(news_text: str) -> tuple:
 
 ## 구성
 1. 헤더 배너 (쿠대 마스터 인사이트 #{issue_num} / {today})
-2. 목차 박스 (이 글에서 다루는 내용)
-3. 서론 (검색 키워드 포함, 2~3문장)
-4. 🇰🇷 국내 구매대행 트렌드 3개
-   - SEO 키워드 포함 제목
-   - 전문적 설명 7~8문장
-   - 데이터·수치 적극 활용
-   - 실전 전략 4~5가지
-5. 🌏 해외 소싱 추천 아이템 3~4개
-   - SEO 키워드 포함 제목
-   - 상세 설명 7~8문장
-   - 소싱 채널 (구체적 사이트명·검색어)
-   - 예상 마진율 + 근거
-   - 리스크 관리
-6. 📢 플랫폼·정책 업데이트 (상세) - 중간에 아래 HTML 삽입:
+2. 목차 박스
+3. 서론 (SEO 키워드 포함, 2~3문장)
+4. 📌 이번 주 소싱 기회 — "뭘 팔까?" [전술|소싱아이템]
+   - 트렌딩 아이템 3~4개
+   - 아이템별: SEO 제목, 왜 지금 팔리는지 7~8문장 + 데이터·수치, 소싱 채널 (구체적 사이트명·검색어), 예상 마진율 + 근거, 리스크 관리
+5. 🛒 플랫폼 & 마진 체크 — "어디서 팔까? 마진이 남나?" [전술|플랫폼마진]
+   - 플랫폼 정책·수수료·노출 변화 상세
+   - 셀러 실전 전략 4~5가지
+6. 쿠대 소개 - 아래 HTML을 그대로 삽입:
 {CTA_BLOG}
-7. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
+7. 🔭 전략 시그널 — "다음 달·분기를 준비한다" [전략|*]
+   - 플랫폼 세력 변화: 어디에 집중해야 하는가 (7~8문장)
+   - 글로벌 소싱 환경: 미국·일본·중국 소싱 유불리 (7~8문장)
+   - 소비자 구조 변화: 어떤 카테고리가 커지는가 (7~8문장)
+   - 각 항목 하단에 "셀러 액션 포인트" 박스
+8. ⚠️ 리스크 알림 [리스크|규정변경]
+   - 이번 주 관세·통관·규정 변화가 있으면: 상세 내용 + 셀러 대응법
+   - 이번 주 주요 변경 없으면: "이번 주 규정 변경 없음 ✅" 한 줄로 표시
+9. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
 {BLOG_REVIEW_TABLE}
-"안녕하세요, 구매대행 전문가 쿠대 마스터입니다." 로 시작하는 전문가 시각 분석 5~6문장과 구체적 실행 제안, "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
-8. 태그 (SEO 키워드 10개, #구매대행 #해외직구 등)
-9. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
+"안녕하세요, 구매대행 전문가 쿠대 마스터입니다." 로 시작 — 전술(당장 팔 것)과 전략(방향)을 연결하는 전문가 시각 5~6문장 + 구체적 실행 제안, "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
+10. 태그 (SEO 키워드 10개, #구매대행 #해외직구 #위탁판매 등)
+11. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
 {BLOG_SNS_BANNER}
-10. 푸터
+12. 푸터
 
 ## 디자인 (블로그 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
@@ -331,13 +361,14 @@ def generate_content(news_text: str) -> tuple:
 
 ### 뉴스카드
 - background-color #ffffff, border 1px solid #e2e8f0, border-radius 12px, padding 24px, margin-bottom 16px
-- 국내: border-left 5px solid #3b82f6
-- 해외: border-left 5px solid #10b981
-- 플랫폼: border-left 5px solid #f59e0b
+- 소싱아이템: border-left 5px solid #10b981
+- 플랫폼마진: border-left 5px solid #f59e0b
+- 전략: border-left 5px solid #3b82f6
+- 리스크: border-left 5px solid #ef4444
 - 카드제목: font-size 18px, font-weight 800, color #0f172a, margin-bottom 12px
 - 카드본문: font-size 14px, color #334155, line-height 2.0
 
-### 전략박스
+### 액션포인트박스
 - background-color #f0f9ff, border-radius 8px, padding 16px 20px, margin-top 12px
 - font-size 13px, color #0369a1, line-height 1.8
 
