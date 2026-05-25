@@ -95,7 +95,9 @@ def save_history(history: dict, new_items: list, new_topics: list):
         payload = {"message": f"AI위클리 이력 업데이트 {datetime.now().strftime('%Y%m%d')}", "content": content}
         if sha:
             payload["sha"] = sha
-        requests.put(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=headers, json=payload)
+        put_resp = requests.put(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=headers, json=payload)
+        if put_resp.status_code not in (200, 201):
+            raise Exception(f"GitHub 저장 실패 ({put_resp.status_code}): {put_resp.text[:200]}")
         print("  ✅ 발행 이력 저장 완료")
     except Exception as e:
         print(f"  ⚠️  이력 저장 실패: {e}")
