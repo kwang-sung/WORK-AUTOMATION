@@ -77,7 +77,7 @@ BANNER_SNS = """
       </a>
     </td>
     <td>
-      <a href="https://www.threads.com/@coudae_official" style="text-decoration:none;display:block;text-align:center;">
+      <a href="https://www.threads.com/@goldensurfer_kr" style="text-decoration:none;display:block;text-align:center;">
         <div style="width:36px;height:36px;background-color:#0f172a;border-radius:8px;text-align:center;line-height:36px;font-size:13px;font-weight:800;color:#ffffff;">@</div>
         <div style="font-size:12px;font-weight:700;color:#1e293b;margin-top:5px;">스레드</div>
       </a>
