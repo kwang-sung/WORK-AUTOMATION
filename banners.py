@@ -14,7 +14,7 @@ BANNER_COUDAE_SIMPLE = """
             <div style="font-size:11px;color:#64748b;margin-top:3px;">구매대행 자동화의 시작 · 누적회원 15,900명</div>
           </td>
           <td style="vertical-align:middle;text-align:right;white-space:nowrap;padding-left:16px;">
-            <a href="https://admin.coudae.kr/#/login" style="display:inline-block;background-color:#e2b04a;color:#1a1a2e;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:800;text-decoration:none;">무료 시작 →</a>
+            <a href="https://www.coudae.io/" style="display:inline-block;background-color:#e2b04a;color:#1a1a2e;border-radius:6px;padding:8px 16px;font-size:12px;font-weight:800;text-decoration:none;">무료 시작 →</a>
             <div style="font-size:10px;color:#94a3b8;margin-top:4px;">💬 좌측 하단 말풍선 문의</div>
           </td>
         </tr>
@@ -39,7 +39,7 @@ BANNER_COUDAE_DARK = """
             <div style="font-size:11px;color:#94a3b8;margin-top:3px;">상품 등록·가격 모니터링·주문 관리 자동화 · 누적회원 15,900명</div>
           </td>
           <td style="vertical-align:middle;text-align:right;white-space:nowrap;padding-left:16px;">
-            <a href="https://admin.coudae.kr/#/login" style="display:inline-block;background-color:#6366f1;color:#ffffff;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:800;text-decoration:none;">무료로 시작하기 →</a>
+            <a href="https://www.coudae.io/" style="display:inline-block;background-color:#6366f1;color:#ffffff;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:800;text-decoration:none;">무료로 시작하기 →</a>
             <div style="font-size:10px;color:#64748b;margin-top:4px;">💬 좌측 하단 말풍선 문의</div>
           </td>
         </tr>
