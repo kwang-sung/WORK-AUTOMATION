@@ -132,7 +132,7 @@ def remove_duplicates(news_text: str, history: dict) -> str:
     prev_items  = "\n".join(history.get("items",  [])[-20:])
     prev_topics = "\n".join(history.get("topics", [])[-20:])
     resp = client.messages.create(
-        model="claude-sonnet-4-5", max_tokens=8000,
+        model="claude-sonnet-4-6", max_tokens=8000,
         messages=[{"role": "user", "content": f"""
 아래 [수집된 뉴스]에서 [이전 발행 이력]과 중복되는 뉴스/토픽을 제거해주세요.
 
@@ -277,12 +277,12 @@ def generate_content(news_text: str) -> tuple:
 
     print("  ✍️  카페용 작성 중...")
     cafe_resp = client.messages.create(
-        model="claude-sonnet-4-5", max_tokens=16000,
+        model="claude-sonnet-4-6", max_tokens=16000,
         messages=[{"role": "user", "content": cafe_prompt}]
     )
     print("  ✍️  블로그용 작성 중...")
     blog_resp = client.messages.create(
-        model="claude-sonnet-4-5", max_tokens=16000,
+        model="claude-sonnet-4-6", max_tokens=16000,
         messages=[{"role": "user", "content": blog_prompt}]
     )
     return cafe_resp.content[0].text, blog_resp.content[0].text
@@ -294,7 +294,7 @@ def verify_and_fix(html: str, label: str) -> str:
     print(f"  🔍 {label} 팩트 검증 중...")
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     extract_resp = client.messages.create(
-        model="claude-sonnet-4-5", max_tokens=800,
+        model="claude-sonnet-4-6", max_tokens=800,
         messages=[{"role": "user", "content": f"""
 아래 HTML에서 검증이 필요한 수치/통계/모델 스펙 정보를 추출하세요.
 형식: "항목명 | 수치내용" 한 줄씩. 없으면 "없음" 반환.
@@ -323,7 +323,7 @@ HTML: {html[:3000]}
         return html
 
     fix_resp = client.messages.create(
-        model="claude-sonnet-4-5", max_tokens=16000,
+        model="claude-sonnet-4-6", max_tokens=16000,
         messages=[{"role": "user", "content": f"""
 아래 HTML에서 팩트 검증 결과 "수정필요" 항목만 올바른 수치로 수정하세요.
 HTML 구조·디자인 절대 변경 금지. 수치 텍스트만 수정.
@@ -340,7 +340,7 @@ HTML 구조·디자인 절대 변경 금지. 수치 텍스트만 수정.
 def extract_history_items(news_text: str) -> tuple:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     resp = client.messages.create(
-        model="claude-sonnet-4-5", max_tokens=500,
+        model="claude-sonnet-4-6", max_tokens=500,
         messages=[{"role": "user", "content": f"""
 아래 AI 뉴스에서 핵심 항목과 토픽을 추출하세요.
 [아이템] AI 모델명/서비스명 목록 (최대 10개, 쉼표 구분)

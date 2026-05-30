@@ -85,7 +85,7 @@ def generate_script(topic: dict, research: str) -> str:
 
     def call(prompt: str, tokens: int = 1000) -> str:
         resp = client.messages.create(
-            model="claude-sonnet-4-5",
+            model="claude-sonnet-4-6",
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )

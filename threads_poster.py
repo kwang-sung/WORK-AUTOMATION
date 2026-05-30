@@ -197,7 +197,7 @@ def generate_threads_post(topic: str, search_result: str) -> str:
 """
 
     resp = client.messages.create(
-        model="claude-sonnet-4-5",
+        model="claude-sonnet-4-6",
         max_tokens=500,
         messages=[{"role": "user", "content": prompt}]
     )
