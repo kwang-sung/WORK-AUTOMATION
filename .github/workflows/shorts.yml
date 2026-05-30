@@ -5,6 +5,10 @@ on:
     - cron: '0 1 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31 * *'  # 격일 KST 10:00
   workflow_dispatch:
 
+concurrency:
+  group: youtube-shorts
+  cancel-in-progress: false
+
 jobs:
   shorts-package:
     runs-on: ubuntu-latest

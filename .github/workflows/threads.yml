@@ -5,6 +5,10 @@ on:
     - cron: '0 9 * * *'    # 매일 KST 18:00 (GitHub Actions 큐 지연 감안)
   workflow_dispatch:
 
+concurrency:
+  group: threads-posting
+  cancel-in-progress: false
+
 jobs:
   threads-posting:
     runs-on: ubuntu-latest

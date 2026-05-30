@@ -6,6 +6,10 @@ on:
     - cron: '0 6 * * 4'   # 매주 목요일 KST 15:00
   workflow_dispatch:
 
+concurrency:
+  group: health-ja
+  cancel-in-progress: false
+
 jobs:
   health-ja:
     runs-on: ubuntu-latest
