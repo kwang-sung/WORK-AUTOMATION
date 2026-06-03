@@ -8,11 +8,14 @@ Gemini로 아이템 서치 → Claude가 스레드용 글 작성 → Threads API
 import os
 import json
 import time
+import smtplib
 import requests
 import anthropic
 from google import genai
 from google.genai import types
 from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 try:
     from dotenv import load_dotenv
@@ -29,6 +32,22 @@ THREADS_APP_ID       = os.environ.get("THREADS_APP_ID", "")
 THREADS_APP_SECRET   = os.environ.get("THREADS_APP_SECRET", "")
 GITHUB_TOKEN         = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO          = os.environ.get("GITHUB_REPOSITORY", "")  # 자동 주입됨
+GMAIL_USER           = os.environ.get("GMAIL_USER", "")
+GMAIL_APP_PW         = os.environ.get("GMAIL_APP_PW", "")
+RECIPIENT_EMAIL      = os.environ.get("RECIPIENT_EMAIL", "")
+
+# 발행 차단 패턴 — AI가 정보 부족으로 생성한 실패 응답 감지
+BAD_PATTERNS = [
+    "정보를 채워주시면",
+    "조사된 정보가 비어",
+    "아래 정보를",
+    "알려주시면 바로",
+    "정보가 없어서",
+    "구체적인 아이템 데이터 없이",
+    "혹시 아래",
+    "추천 아이템명",
+    "일본 현지 매입가",
+]
 
 # ─── 요일별 포스팅 주제 ───────────────────────────────────
 DAILY_TOPICS = {
@@ -243,7 +262,53 @@ def post_to_threads(text: str) -> bool:
         return False
 
 
-# ─── 4. 결과 저장 ─────────────────────────────────────────
+# ─── 4. 발행 전 유효성 검사 ──────────────────────────────
+def is_valid_post(text: str) -> bool:
+    if len(text.strip()) < 80:
+        return False
+    for pattern in BAD_PATTERNS:
+        if pattern in text:
+            return False
+    return True
+
+
+# ─── 5. 결과 이메일 알림 ─────────────────────────────────
+def send_notification(post_text: str, status: str, reason: str = ""):
+    if not all([GMAIL_USER, GMAIL_APP_PW, RECIPIENT_EMAIL]):
+        return
+    today = datetime.now().strftime("%Y년 %m월 %d일 %H:%M")
+    if status == "success":
+        subject = f"✅ 스레드 발행 완료 | {today}"
+        color, label = "#16a34a", "발행 완료"
+    else:
+        subject = f"🚨 스레드 발행 차단됨 | {today}"
+        color, label = "#dc2626", f"발행 차단 — {reason}"
+    html = f"""
+<div style="max-width:600px;margin:0 auto;font-family:'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif;">
+  <div style="background-color:#1a3a6b;border-radius:12px;padding:28px;text-align:center;margin-bottom:16px;">
+    <div style="font-size:22px;font-weight:900;color:#ffffff;">🧵 스레드 자동화 알림</div>
+    <div style="font-size:12px;color:#94a3b8;margin-top:6px;">{today}</div>
+  </div>
+  <div style="background-color:{color}1a;border-left:4px solid {color};border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:800;color:{color};">{label}</div>
+  </div>
+  <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:18px;white-space:pre-wrap;font-size:14px;color:#334155;line-height:1.8;">{post_text}</div>
+</div>"""
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"]    = GMAIL_USER
+    msg["To"]      = RECIPIENT_EMAIL
+    msg.attach(MIMEText(html, "html", "utf-8"))
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_USER, GMAIL_APP_PW)
+            server.sendmail(GMAIL_USER, RECIPIENT_EMAIL, msg.as_string())
+        print(f"  📧 알림 메일 발송 → {RECIPIENT_EMAIL}")
+    except Exception as e:
+        print(f"  ⚠️  알림 메일 실패: {e}")
+
+
+# ─── 6. 결과 저장 ─────────────────────────────────────────
 def save_post(text: str):
     fname = f"thread_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     with open(fname, "w", encoding="utf-8") as f:
@@ -277,13 +342,23 @@ def main():
     post_text = generate_threads_post(topic, search_result)
     print(f"\n📝 작성된 글:\n{'-'*40}\n{post_text}\n{'-'*40}\n")
 
-    # 3. 저장
+    # 3. 유효성 검사 — 이상 감지 시 발행 차단
+    if not is_valid_post(post_text):
+        print("🚨 발행 차단: AI가 정보 부족 응답을 생성했습니다.")
+        print("   Threads 포스팅을 건너뜁니다.")
+        send_notification(post_text, "blocked", "Gemini 검색 결과 부족으로 AI가 비정상 응답 생성")
+        print("\n⛔ 발행 중단 — 알림 메일 발송 완료")
+        print("=" * 55)
+        return
+
+    # 4. 저장
     save_post(post_text)
 
-    # 4. Threads 포스팅
+    # 5. Threads 포스팅
     if THREADS_ACCESS_TOKEN and THREADS_USER_ID:
         print("🧵 Threads 포스팅 중...")
-        post_to_threads(post_text)
+        success = post_to_threads(post_text)
+        send_notification(post_text, "success" if success else "blocked", "Threads API 발행 실패")
     else:
         print("⚠️  THREADS_ACCESS_TOKEN 또는 THREADS_USER_ID 미설정")
 
