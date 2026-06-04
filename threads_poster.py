@@ -8,6 +8,7 @@ Gemini로 아이템 서치 → Claude가 스레드용 글 작성 → Threads API
 import os
 import json
 import time
+import random
 import smtplib
 import requests
 import anthropic
@@ -37,6 +38,18 @@ GMAIL_APP_PW         = os.environ.get("GMAIL_APP_PW", "")
 RECIPIENT_EMAIL      = os.environ.get("RECIPIENT_EMAIL", "")
 TELEGRAM_BOT_TOKEN   = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID     = os.environ.get("TELEGRAM_CHAT_ID", "")
+
+# 서두 스타일 풀 — 매일 랜덤 선택
+OPENING_STYLES = [
+    "소싱 중 발견한 것처럼: 플랫폼 보다가 우연히 발견한 느낌으로 시작. 예) '오늘 라쿠텐 보다가', '야후재팬 뒤지다가'",
+    "결과 공유형: 이미 팔아본 결과를 담담하게. 예) '이번 주 마진 제일 잘 나온 게', '요즘 꾸준히 팔리는 거'",
+    "시즌/날씨 연결형: 지금 시기와 자연스럽게 연결. 예) '날씨 더워지는데', '장마 전에', '이 계절에'",
+    "경험담형: 셀러로서의 경험을 짧게. 예) '주문 들어오는 거 보니까', '문의 몇 번 오더니'",
+    "숫자 직접형: 인사 없이 마진율·가격으로 바로 시작. 예) '마진 42% 나왔어요', '3만원짜리가 국내서 9만원'",
+    "비교/관찰형: 시장 변화를 관찰하듯. 예) '알리랑 비교하면', '작년이랑 다르게', '요즘 트렌드가'",
+    "짧은 질문형: 한 줄 질문으로 시작. 예) '이거 혹시 봤어요?', '이 아이템 아는 사람?'",
+    "결론 먼저형: 이유 없이 결론부터. 예) '이번 주 추천은 이거예요', '딱 3개만 골랐어요'",
+]
 
 # 발행 차단 패턴 — AI가 정보 부족으로 생성한 실패 응답 감지
 BAD_PATTERNS = [
@@ -181,6 +194,7 @@ def generate_threads_post(topic: str, search_result: str) -> str:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     today  = datetime.now().strftime("%Y년 %m월 %d일")
     weekday = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
+    opening_style = random.choice(OPENING_STYLES)
 
     prompt = f"""
 당신은 구매대행을 직접 하는 셀러입니다. 쿠대 카페에 가끔 글 올리는 사람이에요.
@@ -192,24 +206,21 @@ def generate_threads_post(topic: str, search_result: str) -> str:
 {search_result}
 =====================
 
+## 오늘의 서두 스타일 (반드시 이 방식으로 첫 줄 시작)
+{opening_style}
+
 ## 작성 규칙
 - 200~300자 이내
 - 핵심 아이템 2~3개만 간결하게
 - 예상 마진율 포함
 - 말투는 '해요/이에요'체 (반말 X, 너무 격식 차린 '~합니다'도 X — 평범한 존중 톤)
-- 이모지는 글 전체에서 **0~2개**만, 안 써도 됩니다 (필요할 때만 자연스럽게)
-- 사람이 직접 쓴 것처럼 — AI 느낌 나는 표현은 피해주세요
-  (예: "~을 추천드립니다", "~해보시는 건 어떨까요" 같은 정형 표현 자제)
-- 첫 줄은 사람이 진짜 발견했을 때 쓰는 자연스러운 후킹으로 시작
-  (예: "어제 일본 라쿠텐 보다가 이거 발견했는데",
-   "이거 마진 50% 나오는 거 진짜 오랜만이에요",
-   "이번 주 알리에서 진짜 잘 팔리는 거 3개 추렸어요")
-- 단, 광고스러운 과장 후킹은 절대 X
-  (예: "🔥 충격적인 ~!!", "✨ 놓치면 후회하는 ~", "💰 마진 보장!",
-   "지금 당장 시작하세요" 같은 광고성 표현 자제)
+- 이모지는 글 전체에서 0~2개만, 안 써도 됩니다
+- 사람이 직접 쓴 것처럼 — AI 느낌 나는 표현 금지
+  ("~을 추천드립니다", "~해보시는 건 어떨까요" 같은 정형 표현 자제)
+- 광고스러운 과장 표현 절대 금지
+  ("🔥 충격적인~", "놓치면 후회", "마진 보장", "지금 당장 시작하세요" 등)
 - 마지막 줄: "자세한 건 쿠대 카페 cafe.naver.com/coudae" 정도로 자연스럽게
-- 해시태그 3개 정도 (#구매대행 #해외직구 #소싱)
-- 광고 티 내지 않기
+- 해시태그 3개 (#구매대행 #해외직구 #소싱)
 
 ## 오늘 주제
 {topic}
