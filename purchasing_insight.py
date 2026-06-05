@@ -37,7 +37,6 @@ RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
 GITHUB_TOKEN      = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO       = os.environ.get("GITHUB_REPOSITORY", "")
 HISTORY_FILE      = "data/insight_history.json"
-BLOG_ONLY         = os.environ.get("BLOG_ONLY", "false").lower() == "true"
 
 SEARCH_QUERIES = [
     # (레이어,             검색 쿼리)
@@ -510,14 +509,11 @@ def main():
     history = load_history()
     print(f"   이전 항목 {len(history.get('items',[]))}개 / 토픽 {len(history.get('topics',[]))}개")
 
-    if BLOG_ONLY:
-        print("\n🔁 블로그 재발행 모드 — last_sent 체크 스킵")
-    else:
-        today_key = datetime.now().strftime('%Y-%m-%d')
-        if history.get("last_sent") == today_key:
-            print(f"\n⚠️  오늘({today_key}) 이미 발행 완료 — 중복 실행 차단")
-            print("=" * 55)
-            return
+    today_key = datetime.now().strftime('%Y-%m-%d')
+    if history.get("last_sent") == today_key:
+        print(f"\n⚠️  오늘({today_key}) 이미 발행 완료 — 중복 실행 차단")
+        print("=" * 55)
+        return
 
     print("\n📡 Gemini 뉴스 수집 중...")
     news_text = collect_news()
@@ -533,25 +529,21 @@ def main():
     print("   작성 완료")
 
     print("\n🔍 팩트 검증 중...")
-    if not BLOG_ONLY:
-        cafe_html = verify_and_fix(cafe_html, "카페용")
+    cafe_html = verify_and_fix(cafe_html, "카페용")
     blog_html = verify_and_fix(blog_html, "블로그용")
 
-    if not BLOG_ONLY:
-        save_preview(cafe_html, "insight_cafe")
+    save_preview(cafe_html, "insight_cafe")
     save_preview(blog_html, "insight_blog")
 
     today   = datetime.now().strftime("%Y년 %m월 %d일")
     weekday = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
 
     print("\n📧 메일 발송 중...")
-    if not BLOG_ONLY:
-        send_email(cafe_html, f"☕ [카페용] 쿠대 마스터 인사이트 | {today}({weekday})")
+    send_email(cafe_html, f"☕ [카페용] 쿠대 마스터 인사이트 | {today}({weekday})")
     send_email(blog_html, f"📝 [블로그용] 쿠대 마스터 인사이트 | {today}({weekday})")
 
     print("\n💾 발행 이력 저장 중...")
-    if not BLOG_ONLY:
-        save_history(history, new_items, new_topics)
+    save_history(history, new_items, new_topics)
 
     print("\n✅ 완료!")
     print("=" * 55)
