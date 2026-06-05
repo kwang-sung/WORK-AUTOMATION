@@ -407,6 +407,12 @@ def main():
     news_text = collect_news()
     print("   수집 완료")
 
+    if not news_text.strip():
+        print("\n🚨 Gemini 검색 전체 실패 — 크레딧 소진 또는 API 오류")
+        print("   발행을 중단합니다. Gemini 크레딧을 충전해주세요.")
+        print("=" * 55)
+        raise SystemExit(1)
+
     print("\n🔄 중복 제거 중...")
     news_text = remove_duplicates(news_text, history)
 
