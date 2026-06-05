@@ -390,12 +390,12 @@ def generate_content(news_text: str) -> tuple:
 
     print("  ✍️  카페용 작성 중...")
     cafe_resp = client.messages.create(
-        model="claude-sonnet-4-6", max_tokens=16000,
+        model="claude-sonnet-4-6", max_tokens=32000,
         messages=[{"role": "user", "content": cafe_prompt}]
     )
     print("  ✍️  블로그용 작성 중...")
     blog_resp = client.messages.create(
-        model="claude-sonnet-4-6", max_tokens=16000,
+        model="claude-sonnet-4-6", max_tokens=32000,
         messages=[{"role": "user", "content": blog_prompt}]
     )
     return cafe_resp.content[0].text, blog_resp.content[0].text
@@ -435,7 +435,7 @@ HTML: {html[:3000]}
         return html
 
     fix_resp = client.messages.create(
-        model="claude-sonnet-4-6", max_tokens=16000,
+        model="claude-sonnet-4-6", max_tokens=32000,
         messages=[{"role": "user", "content": f"""
 아래 HTML에서 팩트 검증 결과 "수정필요" 항목만 올바른 수치로 수정하세요.
 HTML 구조·디자인 절대 변경 금지. 수치 텍스트만 수정.
