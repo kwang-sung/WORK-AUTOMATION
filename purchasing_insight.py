@@ -389,16 +389,18 @@ def generate_content(news_text: str) -> tuple:
 """
 
     print("  ✍️  카페용 작성 중...")
-    cafe_resp = client.messages.create(
+    with client.messages.stream(
         model="claude-sonnet-4-6", max_tokens=32000,
         messages=[{"role": "user", "content": cafe_prompt}]
-    )
+    ) as stream:
+        cafe_html = stream.get_final_text()
     print("  ✍️  블로그용 작성 중...")
-    blog_resp = client.messages.create(
+    with client.messages.stream(
         model="claude-sonnet-4-6", max_tokens=32000,
         messages=[{"role": "user", "content": blog_prompt}]
-    )
-    return cafe_resp.content[0].text, blog_resp.content[0].text
+    ) as stream:
+        blog_html = stream.get_final_text()
+    return cafe_html, blog_html
 
 
 # ─── 4. 팩트 검증 및 자동 수정 ───────────────────────────
@@ -434,7 +436,7 @@ HTML: {html[:3000]}
         print(f"  ✅ {label} 팩트 검증 통과")
         return html
 
-    fix_resp = client.messages.create(
+    with client.messages.stream(
         model="claude-sonnet-4-6", max_tokens=32000,
         messages=[{"role": "user", "content": f"""
 아래 HTML에서 팩트 검증 결과 "수정필요" 항목만 올바른 수치로 수정하세요.
@@ -443,9 +445,10 @@ HTML 구조·디자인 절대 변경 금지. 수치 텍스트만 수정.
 원본 HTML:\n{html}
 수정된 HTML만 반환. 코드블록 없이.
 """}]
-    )
+    ) as stream:
+        fix_resp_text = stream.get_final_text()
     print(f"  ✅ {label} 팩트 수정 완료")
-    return fix_resp.content[0].text.strip()
+    return fix_resp_text.strip()
 
 
 # ─── 5. 이력 키워드 추출 ──────────────────────────────────
