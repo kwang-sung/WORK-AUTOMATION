@@ -5,6 +5,11 @@ on:
     - cron: '30 0 * * 1'   # 매주 월요일 KST 09:30
     - cron: '30 0 * * 4'   # 매주 목요일 KST 09:30
   workflow_dispatch:
+    inputs:
+      blog_only:
+        description: '블로그만 재발행 (카페 스킵, 이력 저장 스킵)'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -33,3 +38,4 @@ jobs:
           RECIPIENT_EMAIL:    ${{ secrets.RECIPIENT_EMAIL }}
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY:  ${{ github.repository }}
+          BLOG_ONLY:          ${{ github.event.inputs.blog_only }}
