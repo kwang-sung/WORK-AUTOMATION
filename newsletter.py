@@ -47,16 +47,16 @@ SEARCH_QUERIES = [
 ]
 
 CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;border-top:2px solid #e2e8f0;">
-<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">🔗 쿠대 공식채널</p></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">💬 카톡단체방 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
+<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">🔗 쿠대•ALL8 공식채널</p></td></tr>
+<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">💬 온라인 줌 무료강의 진행하는 쿠대마스터 단톡방 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">🧵 스레드 &nbsp;<a href="https://www.threads.com/@goldensurfer_kr" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">▶ 유튜브 &nbsp;<a href="https://www.youtube.com/@coudaeai" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;">📝 블로그 &nbsp;<a href="https://blog.naver.com/gngsun" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 </table>"""
 
 BLOG_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;border-top:2px solid #e2e8f0;">
-<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">🔗 쿠대 공식채널</p></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">💬 카톡단체방 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
+<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">🔗 쿠대•ALL8 공식채널</p></td></tr>
+<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">💬 온라인 줌 무료강의 진행하는 쿠대마스터 단톡방 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">🧵 스레드 &nbsp;<a href="https://www.threads.com/@goldensurfer_kr" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">▶ 유튜브 &nbsp;<a href="https://www.youtube.com/@coudaeai" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;">☕ 카페 &nbsp;<a href="https://cafe.naver.com/coudae" style="color:#6366f1;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
