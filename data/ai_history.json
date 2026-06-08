@@ -6,7 +6,17 @@
     "미토스",
     "ChatGPT",
     "Genie",
-    "Copilot"
+    "Copilot",
+    "GPT-5.5",
+    "GPT-5.4",
+    "코덱스(Codex)",
+    "클로드(Claude)",
+    "MAI-Thinking-1",
+    "MAI-Code-1-Flash",
+    "MAI-Image-2.5",
+    "MiniMax M3",
+    "코스모스 3(Cosmos 3)",
+    "A.Dot Biz Cowork"
   ],
   "topics": [
     "Anthropic 기업가치",
@@ -18,7 +28,17 @@
     "멀티모달",
     "AI 투자",
     "일자리 대체",
-    "마이크로소프트 자체 AI"
+    "마이크로소프트 자체 AI",
+    "AI 에이전트",
+    "멀티모달",
+    "재귀적 자기 개선",
+    "AI 안전성",
+    "코딩 자동화",
+    "클라우드 통합",
+    "피지컬 AI",
+    "B2B AI",
+    "기업 AI 전환(AX)",
+    "파운데이션 모델"
   ],
-  "last_sent": "2026-06-01"
+  "last_sent": "2026-06-08"
 }
