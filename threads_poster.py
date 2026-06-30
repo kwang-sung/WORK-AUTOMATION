@@ -84,7 +84,7 @@ def refresh_token_if_needed():
     """
     global THREADS_ACCESS_TOKEN
 
-    if not all([THREADS_APP_ID, THREADS_APP_SECRET, THREADS_ACCESS_TOKEN, GITHUB_TOKEN, GITHUB_REPO]):
+    if not all([THREADS_ACCESS_TOKEN, GITHUB_TOKEN, GITHUB_REPO]):
         print("  ⚠️  토큰 자동갱신 스킵 (환경변수 미설정)")
         return
 
