@@ -1,16 +1,5 @@
 {
   "items": [
-    "GPT-5.4",
-    "코덱스(Codex)",
-    "클로드(Claude)",
-    "MAI-Thinking-1",
-    "MAI-Code-1-Flash",
-    "MAI-Image-2.5",
-    "MiniMax M3",
-    "코스모스 3(Cosmos 3)",
-    "A.Dot Biz Cowork",
-    "Fable 5",
-    "Mythos 5",
     "Gemini 3.5",
     "Gemini 3.5 Live Translate",
     "Google AI Plus",
@@ -39,19 +28,20 @@
     "Nvidia Blackwell",
     "Google TPU",
     "Apple Intelligence",
-    "****"
+    "****",
+    "ChatGPT 5.6",
+    "GPT-5.6",
+    "Gemini 3.5 Flash",
+    "Nano Banana 2 Lite",
+    "Gemini Omni Flash",
+    "Claude Mythos 5",
+    "Claude Fable 5",
+    "그록 4.5 (Grok 4.5)",
+    "ChatGPT Work",
+    "MAI (MAI-Thinking-1)",
+    "Copilot"
   ],
   "topics": [
-    "멀티모달",
-    "재귀적 자기 개선",
-    "AI 안전성",
-    "코딩 자동화",
-    "클라우드 통합",
-    "피지컬 AI",
-    "B2B AI",
-    "기업 AI 전환(AX)",
-    "파운데이션 모델",
-    "국가안보",
     "AI 접근 차단",
     "기업공개(IPO)",
     "AI 가격 인하",
@@ -81,7 +71,17 @@
     "이미지-비디오 생성",
     "프라이버시",
     "AI 하드웨어",
-    "****"
+    "****",
+    "영업비밀 침해 소송",
+    "AI 모델 출시",
+    "비용 효율성",
+    "AI 검색 업데이트",
+    "수출 규제 해제",
+    "AI 거버넌스",
+    "AI 에이전트",
+    "업무 자동화",
+    "자체 AI 모델 내재화",
+    "IPO"
   ],
-  "last_sent": "2026-07-06"
+  "last_sent": "2026-07-13"
 }
