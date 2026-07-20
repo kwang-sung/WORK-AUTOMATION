@@ -186,13 +186,13 @@ def generate_content(news_text: str) -> tuple:
     <a href="https://www.coudae.io/" style="background-color:#e2b04a;color:#1a1a2e;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료 시작 →</a>
   </div>
 </div>
-<div style="background-color:#f0fdf4;border:1px solid #86efac;border-left:4px solid #16a34a;border-radius:0 12px 12px 0;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 24px 0;">
+<div style="background-color:#ffffff;border:1px solid #16a34a;border-left:5px solid #16a34a;border-radius:0 12px 12px 0;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 24px 0;">
   <div style="flex:1;">
     <div style="display:inline-block;background-color:#16a34a;color:#ffffff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:800;margin-bottom:6px;">FREE</div>
-    <div style="font-size:15px;font-weight:800;color:#1e293b;">ALL8 — 구매대행 통합 솔루션 무료체험</div>
-    <div style="font-size:12px;color:#64748b;margin-top:3px;">소싱·판매·정산 한 번에 관리</div>
+    <div style="font-size:15px;font-weight:800;color:#0f172a;">ALL8 — 구매대행 통합 솔루션 무료체험</div>
+    <div style="font-size:12px;color:#166534;margin-top:3px;">소싱·판매·정산 한 번에 관리</div>
   </div>
-  <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+  <div style="flex-shrink:0;">
     <a href="https://all8.io/" style="background-color:#16a34a;color:#ffffff;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료체험 →</a>
   </div>
 </div>"""
@@ -207,11 +207,11 @@ def generate_content(news_text: str) -> tuple:
     <a href="https://www.coudae.io/" style="background-color:#6366f1;color:#ffffff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료로 시작하기 →</a>
   </div>
 </div>
-<div style="background-color:#052e16;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #166534;margin:0 0 24px 0;">
+<div style="background-color:#0f172a;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #16a34a;margin:0 0 24px 0;">
   <div style="width:44px;height:44px;background-color:#16a34a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🛒</div>
   <div style="flex:1;">
     <div style="font-size:16px;font-weight:800;color:#ffffff;">ALL8 — 구매대행 통합 솔루션</div>
-    <div style="font-size:12px;color:#86efac;margin-top:4px;">소싱·판매·정산 한 번에 관리 · 지금 무료체험</div>
+    <div style="font-size:12px;color:#4ade80;margin-top:4px;">소싱·판매·정산 한 번에 관리 · 지금 무료체험</div>
   </div>
   <div style="flex-shrink:0;margin-left:auto;">
     <a href="https://all8.io/" style="background-color:#16a34a;color:#ffffff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료체험 →</a>
