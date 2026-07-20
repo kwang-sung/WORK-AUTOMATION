@@ -86,25 +86,34 @@ def load_history() -> dict:
 def save_history(history: dict, new_items: list, new_topics: list):
     if not GITHUB_TOKEN or not GITHUB_REPO:
         return
-    try:
-        history["items"]  = (history.get("items",  []) + new_items)[-40:]
-        history["topics"] = (history.get("topics", []) + new_topics)[-40:]
-        history["last_sent"] = datetime.now().strftime('%Y-%m-%d')
-        headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-        content = base64.b64encode(json.dumps(history, ensure_ascii=False, indent=2).encode()).decode()
-        sha = None
-        resp = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=headers)
-        if resp.status_code == 200:
-            sha = resp.json().get("sha")
-        payload = {"message": f"AI위클리 이력 업데이트 {datetime.now().strftime('%Y%m%d')}", "content": content}
-        if sha:
-            payload["sha"] = sha
-        put_resp = requests.put(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=headers, json=payload)
-        if put_resp.status_code not in (200, 201):
-            raise Exception(f"GitHub 저장 실패 ({put_resp.status_code}): {put_resp.text[:200]}")
-        print("  ✅ 발행 이력 저장 완료")
-    except Exception as e:
-        print(f"  ⚠️  이력 저장 실패: {e}")
+    history["items"]  = (history.get("items",  []) + new_items)[-40:]
+    history["topics"] = (history.get("topics", []) + new_topics)[-40:]
+    history["last_sent"] = datetime.now().strftime('%Y-%m-%d')
+    headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    content = base64.b64encode(json.dumps(history, ensure_ascii=False, indent=2).encode()).decode()
+    for attempt in range(3):
+        try:
+            sha = None
+            resp = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=headers)
+            if resp.status_code == 200:
+                sha = resp.json().get("sha")
+            payload = {"message": f"AI위클리 이력 업데이트 {datetime.now().strftime('%Y%m%d')}", "content": content}
+            if sha:
+                payload["sha"] = sha
+            put_resp = requests.put(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=headers, json=payload)
+            if put_resp.status_code in (200, 201):
+                print("  ✅ 발행 이력 저장 완료")
+                return
+            elif put_resp.status_code == 409:
+                print(f"  ⚠️  SHA 충돌, 재시도 중 ({attempt+1}/3)...")
+                time.sleep(3)
+            else:
+                print(f"  ⚠️  이력 저장 실패 ({put_resp.status_code}): {put_resp.text[:200]}")
+                return
+        except Exception as e:
+            print(f"  ⚠️  이력 저장 오류 ({attempt+1}/3): {e}")
+            time.sleep(3)
+    print("  ❌ 이력 저장 3회 모두 실패 — last_sent 미기록")
 
 
 # ─── 1. Gemini 서치 ───────────────────────────────────────
