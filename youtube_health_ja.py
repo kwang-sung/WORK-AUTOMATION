@@ -26,22 +26,22 @@ GMAIL_APP_PW      = os.environ.get("GMAIL_APP_PW", "")
 RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
 
 TOPICS = [
-    {"category": "몸", "ko": "무릎이 시려서 잠 못 자는 밤", "ja": "膝が冷えて眠れない夜、一人でできること"},
-    {"category": "몸", "ko": "넘어질 것 같은 두려움", "ja": "転びそうな恐怖、自宅でできる改善法"},
-    {"category": "마음", "ko": "자식한테 전화하기 미안한 어르신", "ja": "子供に電話するのが申し訳ない、そんな親御さんへ"},
-    {"category": "마음", "ko": "혼자 밥 먹는 게 서러운 날", "ja": "一人で食事するのが寂しい日のために"},
-    {"category": "실용", "ko": "혼자 사는 70대가 꼭 알아야 할 것", "ja": "一人暮らしの70代が必ず知っておくべき5つのこと"},
-    {"category": "실용", "ko": "병원에서 의사한테 꼭 물어봐야 할 것들", "ja": "病院で医師に必ず聞くべきこと"},
-    {"category": "위로", "ko": "오래 살아서 미안하다고 하지 마세요", "ja": "長生きして申し訳ないなんて、言わないでください"},
-    {"category": "위로", "ko": "나이 드는 게 무서운 게 아닙니다", "ja": "歳をとることは怖いことじゃありません"},
-    {"category": "몸", "ko": "밥맛이 없어진 이유", "ja": "食欲がなくなった理由、病院の前に確認すること"},
-    {"category": "마음", "ko": "친구들이 하나둘 떠나갈 때", "ja": "友人が一人一人逝く中で、心を守る方法"},
-    {"category": "실용", "ko": "자식한테 폐 안 끼치고 혼자 건강하게", "ja": "子供に迷惑をかけず、一人で健康に暮らす方法"},
-    {"category": "위로", "ko": "당신이 살아온 것만으로 충분합니다", "ja": "あなたが生きてきたこと、それだけで十分です"},
-    {"category": "몸", "ko": "소변이 자꾸 마려운 70대", "ja": "頻尿に悩む70代へ、恥ずかしいことじゃありません"},
-    {"category": "마음", "ko": "내가 짐이 되는 것 같아서 무서운 밤", "ja": "自分が重荷になっているようで怖い夜"},
-    {"category": "실용", "ko": "겨울 새벽 화장실 가다 쓰러지는 이유", "ja": "冬の早朝、トイレで倒れる理由と予防法"},
-    {"category": "위로", "ko": "지금 이 나이가 가장 솔직한 나이", "ja": "今のこの年齢が、最も正直な年齢です"},
+    {"category": "長寿",   "ja": "110歳を超えた人たちが、静かに続けていた朝の習慣"},
+    {"category": "対比",   "ja": "同じ85歳なのに、なぜこの人だけ背筋が伸びているのか"},
+    {"category": "暮らし", "ja": "100歳の現役理容師が、60年間やめなかったこと"},
+    {"category": "長寿",   "ja": "世界の長寿地域に共通する、たった一つの暮らし方"},
+    {"category": "対比",   "ja": "90歳で記憶力が40代の人たちは、何が違ったのか"},
+    {"category": "暮らし", "ja": "施設に入らず、自宅で最期まで暮らした人の一日"},
+    {"category": "言葉",   "ja": "80歳から始めた人たち。遅すぎることはなかった"},
+    {"category": "暮らし", "ja": "一人暮らしの90代が「寂しくない」と言った理由"},
+    {"category": "長寿",   "ja": "長生きした人が口を揃えて言う「やらなかったこと」"},
+    {"category": "言葉",   "ja": "105歳の医師が、患者に伝え続けた言葉"},
+    {"category": "暮らし", "ja": "夫を見送った80代の女性が、その後に始めたこと"},
+    {"category": "対比",   "ja": "歳をとっても友人が減らなかった人の共通点"},
+    {"category": "長寿",   "ja": "認知症にならなかった人たちの、退屈な毎日"},
+    {"category": "言葉",   "ja": "70代で人生が変わったと語る人たちの話"},
+    {"category": "対比",   "ja": "老いを受け入れた人と、抗い続けた人の違い"},
+    {"category": "言葉",   "ja": "静かに歳を重ねた人が残した、短い言葉"},
 ]
 
 JA_STYLE = """
@@ -50,6 +50,10 @@ JA_STYLE = """
 - 専門用語は絶対に使わない
 - 少し距離感を保ちながらも温かく
 - 孤独・孤独死への不安など日本シニア特有の感情を反映
+- 主題は「病気」ではなく「人」。病名を軸にしない
+- 医学的な診断・治療・助言は一切行わない
+- 実在する人物・研究・報道のみを扱い、架空の人物や事例を作らない
+- 断定を避け、「〜と報告されています」「〜という研究があります」と出典を示す
 - 「迷惑をかけたくない」という心理に寄り添う
 - 間接的で繊細な表現
 - 季節や自然の表現を活用
@@ -65,12 +69,15 @@ def search_with_gemini(topic: dict) -> str:
         resp = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=(
-                f"70代以上のシニア向けに次のテーマで最新情報を調査してください: {topic['ja']}\n\n"
-                f"1. 関連する最新の医学・心理研究や統計\n"
-                f"2. 専門家のアドバイス\n"
-                f"3. 実際のシニアが経験する具体的な状況\n"
-                f"4. 自宅で一人でできる実践的な方法9つ以上\n"
-                f"5. 日本のシニア特有の状況も含めて\n"
+                f"次のテーマについて、実在する人物と研究に基づいた資料を調査してください: {topic['ja']}\n\n"
+                f"1. 該当する実在の人物（超長寿者、高齢の現役者など）の具体的なエピソード\n"
+                f"2. 老年学・長寿研究の知見（研究機関名・発表年を必ず明記）\n"
+                f"3. 報道・ドキュメンタリーで紹介された実例（媒体名を明記）\n"
+                f"4. その人物や集団が実際に続けていた具体的な習慣を9つ以上\n"
+                f"5. 日本国内の事例を優先し、なければ海外事例も可\n\n"
+                f"【必須】すべての情報に出典（機関名・媒体名・年）を添えること。\n"
+                f"【禁止】架空の人物や創作されたエピソードは絶対に含めないこと。\n"
+                f"【禁止】病気の治療法や医学的助言は含めないこと。\n"
             ),
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())]
@@ -111,7 +118,7 @@ def generate_script(topic: dict, research: str) -> str:
     empathy = call(f"{base}\n[共感シーン - 4つ]\n{rules}", 2500)
 
     print("    → 情報シーン...")
-    info = call(f"{base}\n[情報・解決シーン - 9つ]\n{rules}\n自宅で一人でできる方法9つ。", 6000)
+    info = call(f"{base}\n[情報・解決シーン - 9つ]\n{rules}\nその人物・集団が実際に続けていた習慣を9つ。医学的助言ではなく事実の紹介として書くこと。", 6000)
 
     print("    → 励ましシーン...")
     comfort = call(f"{base}\n[励まし・まとめシーン - 3つ]\n{rules}", 2000)
@@ -143,6 +150,8 @@ def generate_script(topic: dict, research: str) -> str:
   【한국어】:
   サブ:（15字以内）
   【한국어】:
+
+▶ 参考資料（動画説明欄に記載する出典リスト。研究機関名・媒体名・年）:
 
 ▶ 動画説明欄:（4〜5行。共感＋内容＋チャンネル紹介＋ハッシュタグ5個）
   【한국어】:
@@ -183,19 +192,19 @@ def send_email(script: str, subject: str) -> bool:
             formatted += "<br>"
             scene_count += 1
         elif line.startswith("【") or line.startswith("━") or line.startswith("📋"):
-            formatted += f'<div style="font-size:11px;font-weight:800;color:#0f2744;margin:16px 0 6px;">{line}</div>'
+            formatted += f'<div style="font-size:11px;font-weight:800;color:#3A2C21;margin:16px 0 6px;">{line}</div>'
         else:
             bg = colors[scene_count % 2]
-            formatted += f'<div style="background:{bg};border-left:3px solid #e2b04a;padding:12px 16px;margin-bottom:2px;font-size:15px;color:#1e293b;line-height:1.9;border-radius:0 6px 6px 0;">{line}</div>'
+            formatted += f'<div style="background:{bg};border-left:3px solid #E8A33D;padding:12px 16px;margin-bottom:2px;font-size:15px;color:#1e293b;line-height:1.9;border-radius:0 6px 6px 0;">{line}</div>'
 
     html = f"""
 <div style="max-width:700px;margin:0 auto;font-family:'Apple SD Gothic Neo','Malgun Gothic',Arial,sans-serif;">
-  <div style="background-color:#0f2744;border-radius:14px;padding:32px;text-align:center;margin-bottom:20px;">
-    <div style="font-size:26px;font-weight:900;color:#ffffff;">🎙️ シニア健康チャンネル台本</div>
+  <div style="background-color:#3A2C21;border-radius:14px;padding:32px;text-align:center;margin-bottom:20px;">
+    <div style="font-size:26px;font-weight:900;color:#ffffff;">🌅 ゴールデンヘルパー 롱폼 대본</div>
     <div style="font-size:13px;color:#94a3b8;margin-top:8px;">{datetime.now().strftime('%Y年%m月%d日')}</div>
-    <div style="display:inline-block;background-color:#e2b04a;color:#1a1a2e;border-radius:20px;padding:6px 20px;font-size:13px;font-weight:700;margin-top:12px;">🇯🇵 日本語台本</div>
+    <div style="display:inline-block;background-color:#E8A33D;color:#1a1a2e;border-radius:20px;padding:6px 20px;font-size:13px;font-weight:700;margin-top:12px;">🇯🇵 日本語台本</div>
   </div>
-  <div style="background-color:#fffbeb;border-left:4px solid #e2b04a;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;">
+  <div style="background-color:#fffbeb;border-left:4px solid #E8A33D;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;">
     <div style="font-size:13px;font-weight:800;color:#92400e;margin-bottom:8px;">📌 制作ガイド</div>
     <div style="font-size:13px;color:#1e293b;line-height:1.8;">
       ✅ シーンごとに画像1枚<br>
@@ -206,7 +215,7 @@ def send_email(script: str, subject: str) -> bool:
   </div>
   <div>{formatted}</div>
   <div style="text-align:center;padding:20px;font-size:12px;color:#94a3b8;">
-    🎙️ シニア健康チャンネル | Powered by Gemini + Claude
+    🌅 ゴールデンヘルパー | 長く生きた人たちの、静かな習慣
   </div>
 </div>"""
 

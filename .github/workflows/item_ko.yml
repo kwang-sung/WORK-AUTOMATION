@@ -1,4 +1,4 @@
-name: 쿠대 자동화 업무 — 시니어 건강 한국어
+name: Golden Helper KR - Item Content
 
 on:
   schedule:
@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: health-ko
+  group: item-ko
   cancel-in-progress: false
 
 jobs:
-  health-ko:
+  item-ko:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,8 +20,8 @@ jobs:
           python-version: '3.11'
       - name: 의존성 설치
         run: pip install -r requirements.txt
-      - name: 한국어 대본 생성
-        run: python youtube_health_ko.py
+      - name: 아이템 대본 생성
+        run: python youtube_item_ko.py
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
