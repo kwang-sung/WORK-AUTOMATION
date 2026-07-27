@@ -1,6 +1,5 @@
 {
   "items": [
-    "Gemini",
     "ChatGPT",
     "Claude Opus 4.8",
     "OpenAI 파트너 네트워크",
@@ -39,10 +38,10 @@
     "Intel 스타파이어",
     "OpenAI",
     "Anthropic Claude",
-    "Moonshot AI"
+    "Moonshot AI",
+    "****"
   ],
   "topics": [
-    "AI 인재 영입 경쟁",
     "기업용 AI 솔루션",
     "AI 법적 책임",
     "AI 기업 가치평가/IPO",
@@ -81,7 +80,8 @@
     "우주등급 AI칩",
     "전략적 협력",
     "에이전트 워크플로우",
-    "생성형AI"
+    "생성형AI",
+    "****"
   ],
-  "last_sent": "2026-07-20"
+  "last_sent": "2026-07-27"
 }
