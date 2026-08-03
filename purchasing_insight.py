@@ -168,7 +168,7 @@ def remove_duplicates(news_text: str, history: dict) -> str:
     prev_items  = "\n".join(history.get("items",  [])[-20:])
     prev_topics = "\n".join(history.get("topics", [])[-20:])
     resp = client.messages.create(
-        model="claude-sonnet-4-6", max_tokens=8000,
+        model="claude-sonnet-5", max_tokens=8000,
         messages=[{"role": "user", "content": f"""
 아래 [수집된 뉴스]에서 [이전 발행 이력]과 중복되는 뉴스/토픽을 제거해주세요.
 
@@ -299,6 +299,8 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 ## 디자인 (카페 복붙 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
 - 외부 폰트 로드 금지
+- 배경색 있는 모든 요소(헤더·요약박스·카드·팁박스 등) div 금지 → <table width="100%" style="border-collapse:collapse"><tr><td style="background-color:...;padding:...;border-radius:..."> 구조 필수 (div background-color는 네이버에서 텍스트 형광색으로 변환됨)
+- display:flex / display:grid 절대 금지 → 네이버에서 레이아웃 붕괴. table 또는 inline-block 사용
 - max-width 720px, margin 0 auto
 - font-family 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
 - background-color #ffffff
@@ -392,6 +394,8 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 ## 디자인 (블로그 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
 - 외부 폰트 로드 금지
+- 배경색 있는 모든 요소(헤더·요약박스·카드·팁박스 등) div 금지 → <table width="100%" style="border-collapse:collapse"><tr><td style="background-color:...;padding:...;border-radius:..."> 구조 필수 (div background-color는 네이버에서 텍스트 형광색으로 변환됨)
+- display:flex / display:grid 절대 금지 → 네이버에서 레이아웃 붕괴. table 또는 inline-block 사용
 - max-width 720px, margin 0 auto
 - font-family 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
 - background-color #ffffff
@@ -487,6 +491,8 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 ## 디자인 (카페 복붙 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
 - 외부 폰트 로드 금지
+- 배경색 있는 모든 요소(헤더·요약박스·카드·팁박스 등) div 금지 → <table width="100%" style="border-collapse:collapse"><tr><td style="background-color:...;padding:...;border-radius:..."> 구조 필수 (div background-color는 네이버에서 텍스트 형광색으로 변환됨)
+- display:flex / display:grid 절대 금지 → 네이버에서 레이아웃 붕괴. table 또는 inline-block 사용
 - max-width 720px, margin 0 auto
 - font-family 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
 - background-color #ffffff
@@ -583,6 +589,8 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 ## 디자인 (블로그 최적화 인라인 CSS - 절대 준수)
 - backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
 - 외부 폰트 로드 금지
+- 배경색 있는 모든 요소(헤더·요약박스·카드·팁박스 등) div 금지 → <table width="100%" style="border-collapse:collapse"><tr><td style="background-color:...;padding:...;border-radius:..."> 구조 필수 (div background-color는 네이버에서 텍스트 형광색으로 변환됨)
+- display:flex / display:grid 절대 금지 → 네이버에서 레이아웃 붕괴. table 또는 inline-block 사용
 - max-width 720px, margin 0 auto
 - font-family 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
 - background-color #ffffff
@@ -629,13 +637,13 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 
     print(f"  ✍️  [{edition_label}] 카페용 작성 중...")
     with client.messages.stream(
-        model="claude-sonnet-4-6", max_tokens=32000,
+        model="claude-sonnet-5", max_tokens=32000,
         messages=[{"role": "user", "content": active_cafe_prompt}]
     ) as stream:
         cafe_html = stream.get_final_text()
     print(f"  ✍️  [{edition_label}] 블로그용 작성 중...")
     with client.messages.stream(
-        model="claude-sonnet-4-6", max_tokens=32000,
+        model="claude-sonnet-5", max_tokens=32000,
         messages=[{"role": "user", "content": active_blog_prompt}]
     ) as stream:
         blog_html = stream.get_final_text()
@@ -647,7 +655,7 @@ def verify_and_fix(html: str, label: str) -> str:
     print(f"  🔍 {label} 팩트 검증 중...")
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     extract_resp = client.messages.create(
-        model="claude-sonnet-4-6", max_tokens=800,
+        model="claude-sonnet-5", max_tokens=800,
         messages=[{"role": "user", "content": f"""
 아래 HTML에서 검증이 필요한 수치/통계/정책 정보를 추출하세요.
 형식: "항목명 | 수치내용" 한 줄씩. 없으면 "없음" 반환.
@@ -676,7 +684,7 @@ HTML: {html[:3000]}
         return html
 
     with client.messages.stream(
-        model="claude-sonnet-4-6", max_tokens=32000,
+        model="claude-sonnet-5", max_tokens=32000,
         messages=[{"role": "user", "content": f"""
 아래 HTML에서 팩트 검증 결과 "수정필요" 항목만 올바른 수치로 수정하세요.
 HTML 구조·디자인 절대 변경 금지. 수치 텍스트만 수정.
@@ -694,7 +702,7 @@ HTML 구조·디자인 절대 변경 금지. 수치 텍스트만 수정.
 def extract_history_items(news_text: str) -> tuple:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     resp = client.messages.create(
-        model="claude-sonnet-4-6", max_tokens=500,
+        model="claude-sonnet-5", max_tokens=500,
         messages=[{"role": "user", "content": f"""
 아래 구매대행 뉴스에서 핵심 항목과 토픽을 추출하세요.
 [아이템] 상품명/트렌드명 목록 (최대 10개, 쉼표 구분)
