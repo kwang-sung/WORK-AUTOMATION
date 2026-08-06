@@ -3,9 +3,8 @@
 쿠대 마스터 인사이트 - 구매대행 뉴스레터
 매주 월요일·목요일 09:30 자동 실행
 
-메일 2통 발송:
-1. 카페용 - 친근한 톤 + 쿠대 마스터 총평
-2. 블로그용 - SEO 최적화 + 쿠대 마스터 총평
+메일 1통 발송 (카페용):
+- 친근한 톤 + 쿠대 마스터 총평
 
 중복방지: 이전 발행 이력과 비교하여 중복 제거
 팩트검증: 작성된 글의 수치 Gemini로 재검증 후 자동 수정
@@ -78,16 +77,6 @@ CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="
 <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">📍 스레드 &nbsp;<a href="https://www.threads.com/@goldensurfer_kr" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">📸 인스타 &nbsp;<a href="https://www.instagram.com/goldensurfer_kr/" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 <tr><td style="padding:6px 0;">📝 블로그 &nbsp;<a href="https://blog.naver.com/gngsun" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-</table>"""
-
-BLOG_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;border-top:2px solid #e2e8f0;">
-<tr><td style="padding:16px 0 8px 0;"><p style="font-size:14px;font-weight:800;color:#1e293b;margin:0;">ALL8. 쿠대 공식채널</p></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">📩 ALL8 대량/반자동 무료체험 &nbsp;<a href="https://all8.io/" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">🔗 쿠대 반자동 무료체험 &nbsp;<a href="https://www.coudae.io/" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;line-height:1.8;">🎁 단체방 입장하면 무료로 드려요!<br>🧮 마진 계산기 + 🌐 글로벌 소싱 레이다 v5<br>👉 &nbsp;<a href="https://open.kakao.com/o/gKWnrBDg" style="color:#e2b04a;font-weight:700;text-decoration:none;">단톡 무료교육 듣기 →</a></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">📍 스레드 &nbsp;<a href="https://www.threads.com/@goldensurfer_kr" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;">📸 인스타 &nbsp;<a href="https://www.instagram.com/goldensurfer_kr/" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
-<tr><td style="padding:6px 0;">☕ 카페 &nbsp;<a href="https://cafe.naver.com/coudae" style="color:#e2b04a;font-weight:700;text-decoration:none;">바로가기 →</a></td></tr>
 </table>"""
 
 
@@ -220,34 +209,7 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
   </div>
 </div>"""
 
-    CTA_BLOG = """<div style="background-color:#1a3a6b;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #2d5a9e;margin:24px 0 8px 0;">
-  <div style="width:44px;height:44px;background-color:#e2b04a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏄</div>
-  <div style="flex:1;">
-    <div style="font-size:16px;font-weight:800;color:#ffffff;">쿠대 — 구매대행 자동화 프로그램</div>
-    <div style="font-size:12px;color:#94a3b8;margin-top:4px;">상품 등록·가격 모니터링·주문 관리 자동화 · 누적회원 15,900명</div>
-  </div>
-  <div style="flex-shrink:0;margin-left:auto;">
-    <a href="https://www.coudae.io/" style="background-color:#e2b04a;color:#1a1a2e;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료로 시작하기 →</a>
-  </div>
-</div>
-<div style="background-color:#0f172a;border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #16a34a;margin:0 0 24px 0;">
-  <div style="width:44px;height:44px;background-color:#16a34a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🛒</div>
-  <div style="flex:1;">
-    <div style="font-size:16px;font-weight:800;color:#ffffff;">ALL8 — 구매대행 통합 솔루션</div>
-    <div style="font-size:12px;color:#4ade80;margin-top:4px;">소싱·판매·정산 한 번에 관리 · 지금 무료체험</div>
-  </div>
-  <div style="flex-shrink:0;margin-left:auto;">
-    <a href="https://all8.io/" style="background-color:#16a34a;color:#ffffff;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;">무료체험 →</a>
-  </div>
-</div>"""
-
     CAFE_REVIEW_TABLE = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;">
-<tr><td style="background-color:#1a3a6b;padding:28px;border-radius:14px;">
-<p style="font-size:16px;font-weight:800;color:#e2b04a;margin:0 0 14px 0;">🏄 쿠대 마스터 총평</p>
-<p style="font-size:14px;color:#e2e8f0;line-height:1.9;margin:0;">[총평내용]</p>
-</td></tr></table>"""
-
-    BLOG_REVIEW_TABLE = """<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:24px;">
 <tr><td style="background-color:#1a3a6b;padding:28px;border-radius:14px;">
 <p style="font-size:16px;font-weight:800;color:#e2b04a;margin:0 0 14px 0;">🏄 쿠대 마스터 총평</p>
 <p style="font-size:14px;color:#e2e8f0;line-height:1.9;margin:0;">[총평내용]</p>
@@ -340,100 +302,6 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 ### 마진뱃지
 - display inline-block, background-color #dcfce7, color #166534
 - border-radius 6px, padding 3px 10px, font-size 12px, font-weight 700, margin-left 8px
-
-### 푸터
-- text-align center, padding 20px, font-size 12px, color #94a3b8
-
-이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
-"""
-
-    # ── 블로그용 ─────────────────────────────────────────
-    blog_prompt = f"""
-당신은 구매대행 전문 블로그 에디터 쿠대 마스터입니다.
-오늘은 {today}({weekday}요일)입니다.
-재고 없이 국내위탁·해외위탁으로 판매하는 셀러를 독자로, 네이버 블로그 SEO에 최적화된 전문 콘텐츠를 작성하세요.
-
-수집 정보의 각 섹션은 레이어로 분류되어 있습니다:
-- [전술|소싱아이템]: 지금 당장 뭘 팔까
-- [전술|플랫폼마진]: 어디서 팔까 / 마진이 남나
-- [전략|*]: 다음 달·분기 방향 잡기
-- [리스크|규정변경]: 놓치면 손해 보는 규정 변화
-
-===== 수집 정보 =====
-{news_text}
-=====================
-
-## 구성
-1. 헤더 배너 (쿠대 마스터 인사이트 #{issue_num} / {today})
-2. 목차 박스
-3. 서론 (SEO 키워드 포함, 2~3문장)
-4. 📌 이번 주 소싱 기회 — "뭘 팔까?" [전술|소싱아이템]
-   - 트렌딩 아이템 3~4개
-   - 아이템별: SEO 제목, 왜 지금 팔리는지 7~8문장 + 데이터·수치, 소싱 채널 (구체적 사이트명·검색어), 예상 마진율 + 근거, 리스크 관리
-5. 🛒 플랫폼 & 마진 체크 — "어디서 팔까? 마진이 남나?" [전술|플랫폼마진]
-   - 플랫폼 정책·수수료·노출 변화 상세
-   - 셀러 실전 전략 4~5가지
-6. 쿠대 소개 - 아래 HTML을 그대로 삽입:
-{CTA_BLOG}
-7. 🔭 전략 시그널 — "다음 달·분기를 준비한다" [전략|*]
-   - 플랫폼 세력 변화: 어디에 집중해야 하는가 (7~8문장)
-   - 글로벌 소싱 환경: 미국·일본·중국 소싱 유불리 (7~8문장)
-   - 소비자 구조 변화: 어떤 카테고리가 커지는가 (7~8문장)
-   - 각 항목 하단에 "셀러 액션 포인트" 박스
-8. ⚠️ 리스크 알림 [리스크|규정변경]
-   - 이번 주 관세·통관·규정 변화가 있으면: 상세 내용 + 셀러 대응법
-   - 이번 주 주요 변경 없으면: "이번 주 규정 변경 없음 ✅" 한 줄로 표시
-9. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
-{BLOG_REVIEW_TABLE}
-"안녕하세요, 구매대행 전문가 쿠대 마스터입니다." 로 시작 — 전술(당장 팔 것)과 전략(방향)을 연결하는 전문가 시각 5~6문장 + 구체적 실행 제안, "다음 포스팅에서도 실전 인사이트로 찾아오겠습니다." 로 마무리
-10. 태그 (SEO 키워드 10개, #구매대행 #해외직구 #위탁판매 등)
-11. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
-{BLOG_SNS_BANNER}
-12. 푸터
-
-## 디자인 (블로그 최적화 인라인 CSS - 절대 준수)
-- backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
-- 외부 폰트 로드 금지
-- 배경색 있는 모든 요소(헤더·요약박스·카드·팁박스 등) div 금지 → <table width="100%" style="border-collapse:collapse"><tr><td style="background-color:...;padding:...;border-radius:..."> 구조 필수 (div background-color는 네이버에서 텍스트 형광색으로 변환됨)
-- display:flex / display:grid 절대 금지 → 네이버에서 레이아웃 붕괴. table 또는 inline-block 사용
-- max-width 720px, margin 0 auto
-- font-family 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
-- background-color #ffffff
-
-### 헤더
-- background-color #1a3a6b, border-radius 16px, padding 40px 36px, text-align center
-- 브랜드명: font-size 28px, font-weight 900, color #ffffff
-- 날짜뱃지: background-color #e2b04a, color #1a1a2e, border-radius 20px, padding 6px 20px, font-size 13px, font-weight 700, display inline-block, margin-top 14px
-
-### 목차박스
-- background-color #f8fafc, border 1px solid #e2e8f0, border-radius 10px, padding 20px 24px, margin 16px 0
-- 제목: font-size 15px, font-weight 800, color #1e293b, margin-bottom 12px
-- 항목: font-size 14px, color #475569, line-height 2.0, padding-left 16px
-
-### 섹션제목
-- font-size 22px, font-weight 900, color #0f172a
-- border-bottom 3px solid #e2b04a, padding-bottom 10px, margin 32px 0 16px
-
-### 뉴스카드
-- background-color #ffffff, border 1px solid #e2e8f0, border-radius 12px, padding 24px, margin-bottom 16px
-- 소싱아이템: border-left 5px solid #10b981
-- 플랫폼마진: border-left 5px solid #f59e0b
-- 전략: border-left 5px solid #3b82f6
-- 리스크: border-left 5px solid #ef4444
-- 카드제목: font-size 18px, font-weight 800, color #0f172a, margin-bottom 12px
-- 카드본문: font-size 14px, color #334155, line-height 2.0
-
-### 액션포인트박스
-- background-color #f0f9ff, border-radius 8px, padding 16px 20px, margin-top 12px
-- font-size 13px, color #0369a1, line-height 1.8
-
-### 마진뱃지
-- display inline-block, background-color #dcfce7, color #166534
-- border-radius 6px, padding 3px 12px, font-size 13px, font-weight 700
-
-### 태그영역
-- margin-top 20px, padding 16px
-- 태그: display inline-block, background-color #f1f5f9, color #475569, border-radius 20px, padding 4px 12px, font-size 12px, margin 4px
 
 ### 푸터
 - text-align center, padding 20px, font-size 12px, color #94a3b8
@@ -538,101 +406,7 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
 """
 
-    thu_blog_prompt = f"""
-당신은 구매대행 전문 블로그 에디터 쿠대 마스터입니다.
-오늘은 {today}({weekday}요일)입니다. 목요일 — 실전 운영 심층 분석일.
-네이버 블로그 SEO에 최적화된 실전 운영 인사이트를 제공하세요.
-
-수집 정보의 각 섹션은 레이어로 분류되어 있습니다:
-- [운영|상품최적화]: 상세페이지·키워드 최적화
-- [운영|가격전략]: 가격 전략·수수료·경쟁력
-- [운영|플랫폼알고리즘]: 플랫폼 알고리즘 변화
-- [수익|마진최적화]: 마진 극대화·원가 절감
-- [수익|묶음전략]: 묶음·세트·객단가
-- [선점|시즌이벤트]: 시즌·이벤트 선점
-- [운영|CS효율화]: CS·반품 효율화
-
-===== 수집 정보 =====
-{news_text}
-=====================
-
-## 구성 (목요일 실전 운영 에디션 - SEO 최적화)
-1. 헤더 배너 (목요일 실전 운영 에디션 #{issue_num} / {today})
-2. 목차 박스
-3. 서론 (SEO 키워드 포함: 구매대행 운영 팁, 쿠팡 셀러 노출, 마진 최적화 등, 3~4문장)
-4. ⚙️ 이번 주 운영 핵심 팁 3가지 [운영|상품최적화, 운영|가격전략, 운영|CS효율화]
-   - 팁 1. 상세페이지 & 키워드 최적화 → 노출 높이는 실전 방법 (7~8문장 + 데이터)
-   - 팁 2. 가격 경쟁력 & 마진 유지 전략 (7~8문장 + 비교 분석)
-   - 팁 3. CS·반품 효율화로 운영 시간 줄이기 (7~8문장 + 실전 사례)
-   - 각 팁 하단에 "즉시 적용 체크리스트" 박스 (3가지)
-5. 💰 마진 극대화 전략 심층 분석 [수익|마진최적화, 수익|묶음전략]
-   - 수수료 절감 포인트 (플랫폼별 수수료 비교)
-   - 묶음·세트 구성 전략 (성공 사례 포함, 7~8문장)
-   - 환율·소싱비용 최적화 타이밍 (7~8문장)
-6. 쿠대 소개 - 아래 HTML을 그대로 삽입:
-{CTA_BLOG}
-7. 📦 플랫폼 알고리즘 & 노출 전략 [운영|플랫폼알고리즘]
-   - 이번 주 쿠팡 알고리즘 변화 핵심 (7~8문장)
-   - 스마트스토어 노출 최적화 전략 (7~8문장)
-   - 각 항목 하단에 "셀러 실행 체크리스트" 박스
-8. 📅 시즌 선점 아이템 분석 [선점|시즌이벤트]
-   - 2~3주 후 시즌·이벤트 2~3가지 상세 분석
-   - 각 시즌별: 추천 소싱 채널, 가격대·마진 분석, 준비 일정
-9. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
-{BLOG_REVIEW_TABLE}
-"안녕하세요, 구매대행 전문가 쿠대 마스터입니다." 로 시작 — 이번 주 운영 핵심을 전문가 시각으로 종합, 가장 중요한 실행 포인트 2가지 제안, "다음 월요일 소싱 인사이트로 찾아오겠습니다." 로 마무리
-10. 태그 (SEO 키워드 10개, #구매대행운영 #쿠팡셀러 #스마트스토어최적화 #마진극대화 등)
-11. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
-{BLOG_SNS_BANNER}
-12. 푸터
-
-## 디자인 (블로그 최적화 인라인 CSS - 절대 준수)
-- backdrop-filter, filter, blur, opacity, 그라데이션 배경 절대 금지
-- 외부 폰트 로드 금지
-- 배경색 있는 모든 요소(헤더·요약박스·카드·팁박스 등) div 금지 → <table width="100%" style="border-collapse:collapse"><tr><td style="background-color:...;padding:...;border-radius:..."> 구조 필수 (div background-color는 네이버에서 텍스트 형광색으로 변환됨)
-- display:flex / display:grid 절대 금지 → 네이버에서 레이아웃 붕괴. table 또는 inline-block 사용
-- max-width 720px, margin 0 auto
-- font-family 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif
-- background-color #ffffff
-
-### 헤더 (목요일 고유 배색)
-- background-color #0f172a, border-radius 16px, padding 40px 36px, text-align center
-- 브랜드명: font-size 28px, font-weight 900, color #ffffff
-- 날짜뱃지: background-color #10b981, color #ffffff, border-radius 20px, padding 6px 20px, font-size 13px, font-weight 700, display inline-block, margin-top 14px
-
-### 목차박스
-- background-color #f8fafc, border 1px solid #e2e8f0, border-radius 10px, padding 20px 24px, margin 16px 0
-- 제목: font-size 15px, font-weight 800, color #1e293b, margin-bottom 12px
-- 항목: font-size 14px, color #475569, line-height 2.0, padding-left 16px
-
-### 섹션제목
-- font-size 22px, font-weight 900, color #0f172a
-- border-bottom 3px solid #10b981, padding-bottom 10px, margin 32px 0 16px
-
-### 카드
-- background-color #ffffff, border 1px solid #e2e8f0, border-radius 12px, padding 24px, margin-bottom 16px
-- 운영팁: border-left 5px solid #10b981
-- 마진: border-left 5px solid #f59e0b
-- 선점: border-left 5px solid #6366f1
-- 카드제목: font-size 18px, font-weight 800, color #0f172a, margin-bottom 12px
-- 카드본문: font-size 14px, color #334155, line-height 2.0
-
-### 체크리스트박스
-- background-color #f0fdf4, border-radius 8px, padding 16px 20px, margin-top 12px
-- font-size 13px, color #166534, line-height 1.8
-
-### 태그영역
-- margin-top 20px, padding 16px
-- 태그: display inline-block, background-color #f1f5f9, color #475569, border-radius 20px, padding 4px 12px, font-size 12px, margin 4px
-
-### 푸터
-- text-align center, padding 20px, font-size 12px, color #94a3b8
-
-이모지 풍부하게. 순수 HTML만 반환. 코드블록·마크다운 없이.
-"""
-
     active_cafe_prompt = thu_cafe_prompt if is_thursday else cafe_prompt
-    active_blog_prompt = thu_blog_prompt if is_thursday else blog_prompt
     edition_label = "목요일 실전 운영" if is_thursday else "월요일 소싱"
 
     print(f"  ✍️  [{edition_label}] 카페용 작성 중...")
@@ -641,13 +415,7 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
         messages=[{"role": "user", "content": active_cafe_prompt}]
     ) as stream:
         cafe_html = stream.get_final_text()
-    print(f"  ✍️  [{edition_label}] 블로그용 작성 중...")
-    with client.messages.stream(
-        model="claude-sonnet-5", max_tokens=32000,
-        messages=[{"role": "user", "content": active_blog_prompt}]
-    ) as stream:
-        blog_html = stream.get_final_text()
-    return cafe_html, blog_html
+    return cafe_html
 
 
 # ─── 4. 팩트 검증 및 자동 수정 ───────────────────────────
@@ -787,15 +555,13 @@ def main():
     new_items, new_topics = extract_history_items(news_text)
 
     print("\n✍️  Claude 콘텐츠 작성 중...")
-    cafe_html, blog_html = generate_content(news_text, is_thursday)
+    cafe_html = generate_content(news_text, is_thursday)
     print("   작성 완료")
 
     print("\n🔍 팩트 검증 중...")
     cafe_html = verify_and_fix(cafe_html, "카페용")
-    blog_html = verify_and_fix(blog_html, "블로그용")
 
     save_preview(cafe_html, "insight_cafe")
-    save_preview(blog_html, "insight_blog")
 
     today   = datetime.now().strftime("%Y년 %m월 %d일")
     weekday = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
@@ -803,7 +569,6 @@ def main():
 
     print("\n📧 메일 발송 중...")
     send_email(cafe_html, f"☕ [카페용] 쿠대 마스터 인사이트 | {today}({weekday}) — {tag}")
-    send_email(blog_html, f"📝 [블로그용] 쿠대 마스터 인사이트 | {today}({weekday}) — {tag}")
 
     print("\n💾 발행 이력 저장 중...")
     save_history(history, new_items, new_topics)
