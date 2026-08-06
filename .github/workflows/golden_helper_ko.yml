@@ -1,15 +1,17 @@
-name: Golden Helper KR - Item Content
+name: 골든헬퍼 KR - 통합 콘텐츠 (아이템 + 복지정보)
 
 on:
-  # 스케줄 비활성화 — golden_helper_ko.yml 통합 스크립트로 대체됨
+  schedule:
+    - cron: '0 6 * * 1'   # 매주 월요일 KST 15:00
+    - cron: '0 6 * * 4'   # 매주 목요일 KST 15:00
   workflow_dispatch:
 
 concurrency:
-  group: item-ko
+  group: golden-helper-ko
   cancel-in-progress: false
 
 jobs:
-  item-ko:
+  golden-helper-ko:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -18,8 +20,8 @@ jobs:
           python-version: '3.11'
       - name: 의존성 설치
         run: pip install -r requirements.txt
-      - name: 아이템 대본 생성
-        run: python youtube_item_ko.py
+      - name: 골든헬퍼 통합 콘텐츠 생성
+        run: python youtube_golden_helper_ko.py
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
