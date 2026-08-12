@@ -86,11 +86,11 @@ def generate_script(category: str, research: str) -> str:
 
     def call(prompt: str, tokens: int = 1000) -> str:
         resp = client.messages.create(
-            model="claude-sonnet-4-6",
+            model="claude-sonnet-5",
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )
-        return resp.content[0].text.strip()
+        return next(b.text for b in resp.content if b.type == "text").strip()
 
     base = f"""카테고리: {category}
 화자 포지션: {FRAMING}

@@ -166,7 +166,7 @@ def remove_duplicates(news_text: str, history: dict) -> str:
 """}]
     )
     print("  ✅ 중복 제거 완료")
-    return resp.content[0].text.strip()
+    return next(b.text for b in resp.content if b.type == "text").strip()
 
 
 
@@ -340,7 +340,7 @@ def verify_and_fix(html: str, label: str) -> str:
 HTML: {html[:3000]}
 """}]
     )
-    claims = extract_resp.content[0].text.strip()
+    claims = next(b.text for b in extract_resp.content if b.type == "text").strip()
     if claims == "없음" or not claims:
         print(f"  ✅ {label} 검증할 수치 없음")
         return html
@@ -388,7 +388,7 @@ def extract_history_items(news_text: str) -> tuple:
 뉴스: {news_text[:2000]}
 """}]
     )
-    text = resp.content[0].text
+    text = next(b.text for b in resp.content if b.type == "text")
     items, topics = [], []
     for line in text.split("\n"):
         line = line.strip()

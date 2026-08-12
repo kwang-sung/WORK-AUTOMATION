@@ -133,7 +133,7 @@ def generate_blog_drafts(research: str) -> str:
         max_tokens=16000,
         messages=[{"role": "user", "content": prompt}]
     )
-    return resp.content[0].text.strip()
+    return next(b.text for b in resp.content if b.type == "text").strip()
 
 
 def send_email(drafts: str, research: str) -> bool:

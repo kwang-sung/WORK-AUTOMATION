@@ -229,11 +229,11 @@ def generate_threads_post(topic: str, search_result: str) -> str:
 """
 
     resp = client.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-sonnet-5",
         max_tokens=500,
         messages=[{"role": "user", "content": prompt}]
     )
-    return resp.content[0].text.strip()
+    return next(b.text for b in resp.content if b.type == "text").strip()
 
 
 # ─── 3. Threads API 포스팅 ────────────────────────────────

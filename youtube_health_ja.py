@@ -93,11 +93,11 @@ def generate_script(topic: dict, research: str) -> str:
 
     def call(prompt: str, tokens: int = 1200) -> str:
         resp = client.messages.create(
-            model="claude-sonnet-4-6",
+            model="claude-sonnet-5",
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )
-        return resp.content[0].text.strip()
+        return next(b.text for b in resp.content if b.type == "text").strip()
 
     base = f"""テーマ: {topic['ja']}
 カテゴリー: {topic['category']}
