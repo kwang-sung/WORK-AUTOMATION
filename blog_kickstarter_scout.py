@@ -8,6 +8,8 @@ Gemini로 크라우드펀딩 신상 발굴 → Claude로 블로그 초안 작성
 import os
 import re
 import json
+import time
+import base64
 import smtplib
 import urllib.parse
 import requests
@@ -17,6 +19,52 @@ from google.genai import types
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+# ─── 발행 이력 관리 ──────────────────────────────────────────
+def load_history() -> dict:
+    if not GITHUB_TOKEN or not GITHUB_REPO:
+        return {"products": []}
+    try:
+        gh = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+        r = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=gh)
+        if r.status_code == 200:
+            return json.loads(base64.b64decode(r.json()["content"]).decode("utf-8"))
+    except Exception as e:
+        print(f"  ⚠️  이력 로드 실패: {e}")
+    return {"products": []}
+
+
+def save_history(history: dict, new_products: list):
+    if not GITHUB_TOKEN or not GITHUB_REPO:
+        return
+    history["products"]  = (history.get("products", []) + new_products)[-60:]
+    history["last_sent"] = datetime.now().strftime("%Y-%m-%d")
+    gh = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    content = base64.b64encode(json.dumps(history, ensure_ascii=False, indent=2).encode()).decode()
+    for attempt in range(3):
+        try:
+            sha = None
+            r = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=gh)
+            if r.status_code == 200:
+                sha = r.json().get("sha")
+            payload = {"message": f"킥스타터 이력 업데이트 {datetime.now().strftime('%Y%m%d')}", "content": content}
+            if sha:
+                payload["sha"] = sha
+            pr = requests.put(f"https://api.github.com/repos/{GITHUB_REPO}/contents/{HISTORY_FILE}", headers=gh, json=payload)
+            if pr.status_code in (200, 201):
+                print("  ✅ 이력 저장 완료")
+                return
+            elif pr.status_code == 409:
+                print(f"  ⚠️  SHA 충돌, 재시도 ({attempt+1}/3)...")
+                time.sleep(3)
+            else:
+                print(f"  ⚠️  이력 저장 실패 ({pr.status_code})")
+                return
+        except Exception as e:
+            print(f"  ⚠️  이력 저장 오류 ({attempt+1}/3): {e}")
+            time.sleep(3)
+    print("  ❌ 이력 저장 3회 실패")
+
 
 KS_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
@@ -35,6 +83,9 @@ GEMINI_API_KEY    = os.environ.get("GEMINI_API_KEY", "")
 GMAIL_USER        = os.environ.get("GMAIL_USER", "")
 GMAIL_APP_PW      = os.environ.get("GMAIL_APP_PW", "")
 RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
+GITHUB_TOKEN      = os.environ.get("GITHUB_TOKEN", "")
+GITHUB_REPO       = os.environ.get("GITHUB_REPO", "")
+HISTORY_FILE      = "data/kickstarter_history.json"
 
 
 def lookup_kickstarter(product_name: str) -> dict:
@@ -60,8 +111,12 @@ def lookup_kickstarter(product_name: str) -> dict:
         return {"url": "확인불가", "image": "확인불가"}
 
 
-def search_products_with_gemini() -> str:
+def search_products_with_gemini(excluded: list) -> str:
     client = genai.Client(api_key=GEMINI_API_KEY)
+    exclude_block = ""
+    if excluded:
+        names = "\n".join(f"- {p}" for p in excluded[-30:])
+        exclude_block = f"\n\n이미 소개한 제품 (반드시 제외할 것):\n{names}"
     try:
         resp = client.models.generate_content(
             model="gemini-2.5-flash",
@@ -81,8 +136,9 @@ def search_products_with_gemini() -> str:
                 "5. 한국 시장 적용 가능성 및 이유\n"
                 "6. 잠재 리스크 (배송 지연·특허·국내 경쟁 등)\n\n"
                 "수치는 확인된 것만. 추정이면 (추정)으로 표시.\n"
-                "URL·이미지는 별도로 직접 조회하므로 출력 불필요.\n\n"
-                "마지막에 반드시 아래 블록 추가 (킥스타터 제품 영문명만, JSON 배열):\n"
+                "URL·이미지는 별도로 직접 조회하므로 출력 불필요."
+                + exclude_block +
+                "\n\n마지막에 반드시 아래 블록 추가 (킥스타터 제품 영문명만, JSON 배열):\n"
                 "===PRODUCTS===\n"
                 "[\"영문제품명1\", \"영문제품명2\"]\n"
                 "===END==="
@@ -291,8 +347,13 @@ def main():
     print(f"   {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 55)
 
-    print("\n🔍 Gemini 신상 탐색 중...")
-    research = search_products_with_gemini()
+    print("\n📂 발행 이력 로드 중...")
+    history  = load_history()
+    excluded = history.get("products", [])
+    print(f"   이전 제품 {len(excluded)}개 제외 예정\n")
+
+    print("🔍 Gemini 신상 탐색 중...")
+    research = search_products_with_gemini(excluded)
     if not research.strip():
         print("\n🚨 Gemini 검색 실패 — 발행 중단")
         raise SystemExit(1)
@@ -309,6 +370,16 @@ def main():
 
     print("📧 메일 발송 중...")
     send_email(drafts, research)
+
+    # 이번 회차 제품명 파싱 → 이력 저장
+    m = re.search(r"===PRODUCTS===\s*(\[.*?\])\s*===END===", research, re.DOTALL)
+    if m:
+        try:
+            new_products = json.loads(m.group(1))
+            print(f"\n📂 이력 저장 중... ({new_products})")
+            save_history(history, new_products)
+        except Exception as e:
+            print(f"  ⚠️  이력 저장 파싱 실패: {e}")
 
     print("\n✅ 완료!")
     print("=" * 55)
