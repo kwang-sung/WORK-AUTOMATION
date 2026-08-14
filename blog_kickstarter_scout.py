@@ -6,13 +6,23 @@ Gemini로 크라우드펀딩 신상 발굴 → Claude로 블로그 초안 작성
 """
 
 import os
+import re
+import json
 import smtplib
+import urllib.parse
+import requests
 import anthropic
 from google import genai
 from google.genai import types
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+KS_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "X-Requested-With": "XMLHttpRequest",
+}
 
 try:
     from dotenv import load_dotenv
@@ -25,6 +35,29 @@ GEMINI_API_KEY    = os.environ.get("GEMINI_API_KEY", "")
 GMAIL_USER        = os.environ.get("GMAIL_USER", "")
 GMAIL_APP_PW      = os.environ.get("GMAIL_APP_PW", "")
 RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
+
+
+def lookup_kickstarter(product_name: str) -> dict:
+    """Kickstarter 검색 JSON API로 실제 URL과 이미지를 직접 조회."""
+    q = urllib.parse.quote(product_name)
+    try:
+        r = requests.get(
+            f"https://www.kickstarter.com/projects/search.json?term={q}",
+            headers=KS_HEADERS, timeout=10
+        )
+        if r.status_code != 200:
+            return {"url": "확인불가", "image": "확인불가"}
+        projects = r.json().get("projects", [])
+        if not projects:
+            return {"url": "확인불가", "image": "확인불가"}
+        p = projects[0]
+        return {
+            "url":   p.get("urls", {}).get("web", {}).get("project", "확인불가"),
+            "image": p.get("photo", {}).get("full", "확인불가"),
+        }
+    except Exception as e:
+        print(f"    ⚠️  KS 조회 실패 ({product_name}): {e}")
+        return {"url": "확인불가", "image": "확인불가"}
 
 
 def search_products_with_gemini() -> str:
@@ -42,24 +75,45 @@ def search_products_with_gemini() -> str:
                 "- 기존 제품과 명확한 차별화 포인트\n\n"
                 "각 제품별 아래 항목을 빠짐없이 출력:\n"
                 "1. 제품명 (영문 + 한글 번역)\n"
-                "2. 캠페인 링크\n"
-                "3. 가격 (캠페인가 / 예상 정가)\n"
-                "4. 펀딩 현황 (달성률%, 후원자수)\n"
-                "5. 핵심 차별화 포인트 2~3개\n"
-                "6. 한국 시장 적용 가능성 및 이유\n"
-                "7. 대표 이미지 URL (공식 캠페인 이미지만, 저작권 문제없는 것)\n"
-                "8. 잠재 리스크 (배송 지연·특허·국내 경쟁 등)\n\n"
-                "수치는 확인된 것만. 추정이면 (추정)으로 표시. "
-                "확인 불가한 이미지 URL은 '확인불가'로 표시할 것."
+                "2. 가격 (캠페인가 / 예상 정가)\n"
+                "3. 펀딩 현황 (달성률%, 후원자수)\n"
+                "4. 핵심 차별화 포인트 2~3개\n"
+                "5. 한국 시장 적용 가능성 및 이유\n"
+                "6. 잠재 리스크 (배송 지연·특허·국내 경쟁 등)\n\n"
+                "수치는 확인된 것만. 추정이면 (추정)으로 표시.\n"
+                "URL·이미지는 별도로 직접 조회하므로 출력 불필요.\n\n"
+                "마지막에 반드시 아래 블록 추가 (킥스타터 제품 영문명만, JSON 배열):\n"
+                "===PRODUCTS===\n"
+                "[\"영문제품명1\", \"영문제품명2\"]\n"
+                "===END==="
             ),
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())]
             )
         )
-        return resp.text
+        research = resp.text
     except Exception as e:
         print(f"  ⚠️  Gemini 서치 실패: {e}")
         return ""
+
+    # 제품명 파싱 → Kickstarter API 직접 조회
+    m = re.search(r"===PRODUCTS===\s*(\[.*?\])\s*===END===", research, re.DOTALL)
+    if m:
+        try:
+            names = json.loads(m.group(1))
+            lines = ["\n\n─── Kickstarter API 직접 조회 결과 (URL·이미지 최우선 사용) ───"]
+            for name in names:
+                info = lookup_kickstarter(name)
+                short_url = info["url"][:70] if info["url"] != "확인불가" else "확인불가"
+                print(f"    🔗 [{name}] {short_url}")
+                lines.append(f"\n제품명: {name}")
+                lines.append(f"  캠페인 URL: {info['url']}")
+                lines.append(f"  대표 이미지: {info['image']}")
+            research += "\n".join(lines)
+        except Exception as e:
+            print(f"  ⚠️  Kickstarter 조회 파싱 실패: {e}")
+
+    return research
 
 
 def generate_blog_drafts(research: str) -> str:
@@ -75,6 +129,10 @@ def generate_blog_drafts(research: str) -> str:
 {research}
 
 ===
+
+⚠️ URL·이미지 사용 원칙:
+조사 자료 하단 "Kickstarter API 직접 조회 결과" 섹션에 있는 캠페인 URL·대표 이미지를 최우선으로 사용하세요.
+해당 값이 "확인불가"인 경우에만 Gemini 수집 데이터를 참고하세요.
 
 제품마다 아래 형식으로 작성하세요. 제품 개수(3~5개)만큼 반복.
 
