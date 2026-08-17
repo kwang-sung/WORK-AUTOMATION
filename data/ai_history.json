@@ -1,15 +1,5 @@
 {
   "items": [
-    "Kimi K2.7 Code",
-    "GLM-5.2",
-    "코어 AI",
-    "Grok Imagine Video 1.5",
-    "Nvidia Blackwell",
-    "Google TPU",
-    "Apple Intelligence",
-    "****",
-    "ChatGPT 5.6",
-    "GPT-5.6",
     "Gemini 3.5 Flash",
     "Nano Banana 2 Lite",
     "Gemini Omni Flash",
@@ -39,19 +29,19 @@
     "DeepSeek V4 Flash",
     "Gemini 3.5 Flash Cyber",
     "Gemini 3.6 Flash",
-    "Google Earth AI"
+    "Google Earth AI",
+    "ChatGPT",
+    "제미나이 3.7 플래시",
+    "제미나이 나노 4",
+    "뮤즈 글리머",
+    "뮤즈 스파크 1.2",
+    "그록 4.6",
+    "엑사원",
+    "Isaac GR00T",
+    "Intercom Fin",
+    "Jasper"
   ],
   "topics": [
-    "오픈소스 모델",
-    "MoE 아키텍처",
-    "AI 에이전트",
-    "워크플로우 재설계",
-    "빅테크 인력 구조조정",
-    "이미지-비디오 생성",
-    "프라이버시",
-    "AI 하드웨어",
-    "****",
-    "영업비밀 침해 소송",
     "AI 모델 출시",
     "비용 효율성",
     "AI 검색 업데이트",
@@ -81,7 +71,17 @@
     "SynthID 워터마크",
     "AI 상품화",
     "제로데이 취약점",
-    "AI 안전 통제"
+    "AI 안전 통제",
+    "OpenAI 기업전략",
+    "온디바이스 AI",
+    "오픈웨이트 모델",
+    "피지컬 AI/휴머노이드",
+    "AI 에이전트",
+    "생산성 역설",
+    "사이버보안 AI",
+    "국내 AI 산업",
+    "이커머스 자동화",
+    "광고 수익모델"
   ],
-  "last_sent": "2026-08-03"
+  "last_sent": "2026-08-17"
 }
