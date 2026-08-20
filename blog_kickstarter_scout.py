@@ -11,7 +11,6 @@ import json
 import time
 import base64
 import smtplib
-import urllib.parse
 import requests
 import anthropic
 from google import genai
@@ -66,12 +65,6 @@ def save_history(history: dict, new_products: list):
     print("  ❌ 이력 저장 3회 실패")
 
 
-KS_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/javascript, */*; q=0.01",
-    "X-Requested-With": "XMLHttpRequest",
-}
-
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -86,29 +79,6 @@ RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
 GITHUB_TOKEN      = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO       = os.environ.get("GITHUB_REPO", "")
 HISTORY_FILE      = "data/kickstarter_history.json"
-
-
-def lookup_kickstarter(product_name: str) -> dict:
-    """Kickstarter 검색 JSON API로 실제 URL과 이미지를 직접 조회."""
-    q = urllib.parse.quote(product_name)
-    try:
-        r = requests.get(
-            f"https://www.kickstarter.com/projects/search.json?term={q}",
-            headers=KS_HEADERS, timeout=10
-        )
-        if r.status_code != 200:
-            return {"url": "확인불가", "image": "확인불가"}
-        projects = r.json().get("projects", [])
-        if not projects:
-            return {"url": "확인불가", "image": "확인불가"}
-        p = projects[0]
-        return {
-            "url":   p.get("urls", {}).get("web", {}).get("project", "확인불가"),
-            "image": p.get("photo", {}).get("full", "확인불가"),
-        }
-    except Exception as e:
-        print(f"    ⚠️  KS 조회 실패 ({product_name}): {e}")
-        return {"url": "확인불가", "image": "확인불가"}
 
 
 def search_products_with_gemini(excluded: list) -> str:
@@ -152,30 +122,19 @@ def search_products_with_gemini(excluded: list) -> str:
         print(f"  ⚠️  Gemini 서치 실패: {e}")
         return ""
 
-    # 제품 정보 파싱 → Kickstarter API 조회(이미지) + Gemini URL 폴백
+    # 제품 정보 파싱 → Gemini 검색 URL 직접 사용
     m = re.search(r"===PRODUCTS===\s*(\[.*?\])\s*===END===", research, re.DOTALL)
     if m:
         try:
             products = json.loads(m.group(1))
-            lines = ["\n\n─── 검증된 URL·이미지 (Claude는 이 값을 최우선 사용) ───"]
+            lines = ["\n\n─── 캠페인 URL 목록 (Claude는 이 값을 최우선 사용) ───"]
             for p in products:
-                name         = p.get("name", "")
-                gemini_url   = p.get("url", "확인불가")
-                platform     = p.get("platform", "").lower()
-
-                if platform == "kickstarter":
-                    ks = lookup_kickstarter(name)
-                    url   = ks["url"]   if ks["url"]   != "확인불가" else gemini_url
-                    image = ks["image"]
-                else:
-                    url   = gemini_url
-                    image = "확인불가"
-
+                name = p.get("name", "") if isinstance(p, dict) else p
+                url  = p.get("url",  "확인불가") if isinstance(p, dict) else "확인불가"
                 short = url[:70] if url != "확인불가" else "확인불가"
                 print(f"    🔗 [{name}] {short}")
                 lines.append(f"\n제품명: {name}")
                 lines.append(f"  캠페인 URL: {url}")
-                lines.append(f"  대표 이미지: {image}")
             research += "\n".join(lines)
         except Exception as e:
             print(f"  ⚠️  제품 파싱 실패: {e}")
@@ -197,9 +156,9 @@ def generate_blog_drafts(research: str) -> str:
 
 ===
 
-⚠️ URL·이미지 사용 원칙:
-조사 자료 하단 "Kickstarter API 직접 조회 결과" 섹션에 있는 캠페인 URL·대표 이미지를 최우선으로 사용하세요.
-해당 값이 "확인불가"인 경우에만 Gemini 수집 데이터를 참고하세요.
+⚠️ URL 사용 원칙:
+조사 자료 하단 "캠페인 URL 목록" 섹션의 URL을 반드시 캠페인 링크에 사용하세요.
+이미지는 자동 수집이 불가하므로 "직접 캡처" 안내 문구를 그대로 출력하세요.
 
 제품마다 아래 형식으로 작성하세요. 제품 개수(3~5개)만큼 반복.
 
@@ -207,8 +166,8 @@ def generate_blog_drafts(research: str) -> str:
 📦 [제품명 (한글)]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-▶ 캠페인 링크: [URL]
-▶ 이미지 URL: [URL 또는 확인불가]
+▶ 캠페인 링크: [URL — 조사 자료 하단 "캠페인 URL 목록"의 값 사용]
+▶ 이미지: 직접 캡처 (이미지 URL 자동 수집 불가 — 캠페인 링크 방문 후 캡처)
 
 ▶ 제목 후보 A (검색형 — 키워드+정보형, 40자 이내):
 ▶ 제목 후보 B (홈피드형 — 호기심·질문형, 40자 이내):
