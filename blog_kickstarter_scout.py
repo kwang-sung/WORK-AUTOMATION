@@ -135,12 +135,12 @@ def search_products_with_gemini(excluded: list) -> str:
                 "4. 핵심 차별화 포인트 2~3개\n"
                 "5. 한국 시장 적용 가능성 및 이유\n"
                 "6. 잠재 리스크 (배송 지연·특허·국내 경쟁 등)\n\n"
-                "수치는 확인된 것만. 추정이면 (추정)으로 표시.\n"
-                "URL·이미지는 별도로 직접 조회하므로 출력 불필요."
+                "수치는 확인된 것만. 추정이면 (추정)으로 표시."
                 + exclude_block +
-                "\n\n마지막에 반드시 아래 블록 추가 (킥스타터 제품 영문명만, JSON 배열):\n"
+                "\n\n마지막에 반드시 아래 블록 추가 (각 제품의 영문명·구글 검색으로 확인한 실제 캠페인 URL·플랫폼, JSON 배열):\n"
                 "===PRODUCTS===\n"
-                "[\"영문제품명1\", \"영문제품명2\"]\n"
+                "[{\"name\": \"영문제품명1\", \"url\": \"https://실제URL\", \"platform\": \"kickstarter\"}, "
+                "{\"name\": \"영문제품명2\", \"url\": \"https://실제URL\", \"platform\": \"indiegogo\"}]\n"
                 "===END==="
             ),
             config=types.GenerateContentConfig(
@@ -152,22 +152,33 @@ def search_products_with_gemini(excluded: list) -> str:
         print(f"  ⚠️  Gemini 서치 실패: {e}")
         return ""
 
-    # 제품명 파싱 → Kickstarter API 직접 조회
+    # 제품 정보 파싱 → Kickstarter API 조회(이미지) + Gemini URL 폴백
     m = re.search(r"===PRODUCTS===\s*(\[.*?\])\s*===END===", research, re.DOTALL)
     if m:
         try:
-            names = json.loads(m.group(1))
-            lines = ["\n\n─── Kickstarter API 직접 조회 결과 (URL·이미지 최우선 사용) ───"]
-            for name in names:
-                info = lookup_kickstarter(name)
-                short_url = info["url"][:70] if info["url"] != "확인불가" else "확인불가"
-                print(f"    🔗 [{name}] {short_url}")
+            products = json.loads(m.group(1))
+            lines = ["\n\n─── 검증된 URL·이미지 (Claude는 이 값을 최우선 사용) ───"]
+            for p in products:
+                name         = p.get("name", "")
+                gemini_url   = p.get("url", "확인불가")
+                platform     = p.get("platform", "").lower()
+
+                if platform == "kickstarter":
+                    ks = lookup_kickstarter(name)
+                    url   = ks["url"]   if ks["url"]   != "확인불가" else gemini_url
+                    image = ks["image"]
+                else:
+                    url   = gemini_url
+                    image = "확인불가"
+
+                short = url[:70] if url != "확인불가" else "확인불가"
+                print(f"    🔗 [{name}] {short}")
                 lines.append(f"\n제품명: {name}")
-                lines.append(f"  캠페인 URL: {info['url']}")
-                lines.append(f"  대표 이미지: {info['image']}")
+                lines.append(f"  캠페인 URL: {url}")
+                lines.append(f"  대표 이미지: {image}")
             research += "\n".join(lines)
         except Exception as e:
-            print(f"  ⚠️  Kickstarter 조회 파싱 실패: {e}")
+            print(f"  ⚠️  제품 파싱 실패: {e}")
 
     return research
 
@@ -375,8 +386,9 @@ def main():
     m = re.search(r"===PRODUCTS===\s*(\[.*?\])\s*===END===", research, re.DOTALL)
     if m:
         try:
-            new_products = json.loads(m.group(1))
-            print(f"\n📂 이력 저장 중... ({new_products})")
+            data = json.loads(m.group(1))
+            new_products = [p["name"] if isinstance(p, dict) else p for p in data]
+            print(f"\n📂 이력 저장 중... {new_products}")
             save_history(history, new_products)
         except Exception as e:
             print(f"  ⚠️  이력 저장 파싱 실패: {e}")

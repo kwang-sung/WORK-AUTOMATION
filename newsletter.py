@@ -318,13 +318,7 @@ def generate_content(news_text: str) -> tuple:
         messages=[{"role": "user", "content": cafe_prompt}]
     ) as stream:
         cafe_html = stream.get_final_text()
-    print("  ✍️  블로그용 작성 중...")
-    with client.messages.stream(
-        model="claude-sonnet-5", max_tokens=32000,
-        messages=[{"role": "user", "content": blog_prompt}]
-    ) as stream:
-        blog_html = stream.get_final_text()
-    return cafe_html, blog_html
+    return cafe_html
 
 
 
@@ -459,20 +453,17 @@ def main():
     new_items, new_topics = extract_history_items(news_text)
 
     print("\n✍️  Claude 콘텐츠 작성 중...")
-    cafe_html, blog_html = generate_content(news_text)
+    cafe_html = generate_content(news_text)
     print("   작성 완료")
 
     print("\n🔍 팩트 검증 중...")
     cafe_html = verify_and_fix(cafe_html, "카페용")
-    blog_html = verify_and_fix(blog_html, "블로그용")
 
     save_preview(cafe_html, "ai_cafe")
-    save_preview(blog_html, "ai_blog")
 
     today = datetime.now().strftime("%Y년 %m월 %d일")
     print("\n📧 메일 발송 중...")
     send_email(cafe_html, f"☕ [카페용] 쿠대 마스터 AI 위클리 | {today}")
-    send_email(blog_html, f"📝 [블로그용] 쿠대 마스터 AI 위클리 | {today}")
 
     print("\n💾 발행 이력 저장 중...")
     save_history(history, new_items, new_topics)
