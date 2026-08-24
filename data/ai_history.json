@@ -1,14 +1,5 @@
 {
   "items": [
-    "Gemini 3.5 Flash",
-    "Nano Banana 2 Lite",
-    "Gemini Omni Flash",
-    "Claude Mythos 5",
-    "Claude Fable 5",
-    "그록 4.5 (Grok 4.5)",
-    "ChatGPT Work",
-    "MAI (MAI-Thinking-1)",
-    "Copilot",
     "Claude Code",
     "Kimi K3",
     "Gemini Enterprise",
@@ -39,19 +30,18 @@
     "엑사원",
     "Isaac GR00T",
     "Intercom Fin",
-    "Jasper"
+    "Jasper",
+    "Gemini",
+    "Gemini Omni Flash",
+    "Anthropic",
+    "HappyShrimp 1.0",
+    "GLM-5.2 Turbo",
+    "Qwen3.8-27B",
+    "GLM-5.3",
+    "Suno",
+    "GPT-5.6 Luna"
   ],
   "topics": [
-    "AI 모델 출시",
-    "비용 효율성",
-    "AI 검색 업데이트",
-    "수출 규제 해제",
-    "AI 거버넌스",
-    "AI 에이전트",
-    "업무 자동화",
-    "자체 AI 모델 내재화",
-    "IPO",
-    "IPO/기업공개",
     "AI 투자 ROI",
     "어린이 안전",
     "코드 마이그레이션",
@@ -81,7 +71,17 @@
     "사이버보안 AI",
     "국내 AI 산업",
     "이커머스 자동화",
-    "광고 수익모델"
+    "광고 수익모델",
+    "사용자 10억 명 돌파",
+    "기업공개(IPO)",
+    "기업가치 2조 달러",
+    "음악 생성 AI",
+    "멀티모달 동영상 생성",
+    "오픈소스 라이선스",
+    "API 서비스",
+    "경량화/효율성",
+    "신흥시장 파트너십",
+    "모델 포트폴리오 확장"
   ],
-  "last_sent": "2026-08-17"
+  "last_sent": "2026-08-24"
 }
