@@ -178,7 +178,7 @@ def remove_duplicates(news_text: str, history: dict) -> str:
 """}]
     )
     print("  ✅ 중복 제거 완료")
-    return next(b.text for b in resp.content if b.type == "text").strip()
+    return next((b.text for b in resp.content if b.type == "text"), "").strip()
 
 
 # ─── 3. Claude 글쓰기 ─────────────────────────────────────

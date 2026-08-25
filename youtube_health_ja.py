@@ -97,7 +97,7 @@ def generate_script(topic: dict, research: str) -> str:
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )
-        return next(b.text for b in resp.content if b.type == "text").strip()
+        return next((b.text for b in resp.content if b.type == "text"), "").strip()
 
     base = f"""テーマ: {topic['ja']}
 カテゴリー: {topic['category']}

@@ -90,7 +90,7 @@ def generate_script(category: str, research: str) -> str:
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )
-        return next(b.text for b in resp.content if b.type == "text").strip()
+        return next((b.text for b in resp.content if b.type == "text"), "").strip()
 
     base = f"""카테고리: {category}
 화자 포지션: {FRAMING}

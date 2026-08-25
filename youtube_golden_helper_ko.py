@@ -177,7 +177,7 @@ def generate_item_script(category: str, research: str) -> str:
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )
-        return next(b.text for b in resp.content if b.type == "text").strip()
+        return next((b.text for b in resp.content if b.type == "text"), "").strip()
 
     base = f"""카테고리: {category}
 화자 포지션: {ITEM_FRAMING}
@@ -269,7 +269,7 @@ def generate_welfare_content(topic: str, research: str, is_monday: bool) -> tupl
             max_tokens=tokens,
             messages=[{"role": "user", "content": prompt}]
         )
-        return next(b.text for b in resp.content if b.type == "text").strip()
+        return next((b.text for b in resp.content if b.type == "text"), "").strip()
 
     # ── 보고서 ───────────────────────────────────────────
     print("    → 복지 보고서 작성...")

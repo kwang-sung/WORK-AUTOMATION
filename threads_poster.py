@@ -233,7 +233,7 @@ def generate_threads_post(topic: str, search_result: str) -> str:
         max_tokens=500,
         messages=[{"role": "user", "content": prompt}]
     )
-    return next(b.text for b in resp.content if b.type == "text").strip()
+    return next((b.text for b in resp.content if b.type == "text"), "").strip()
 
 
 # ─── 3. Threads API 포스팅 ────────────────────────────────
