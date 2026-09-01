@@ -186,14 +186,35 @@ def save_history(history: dict, new_items: list, new_topics: list):
 
 
 # ─── 1. Gemini 서치 ───────────────────────────────────────
-def collect_news(queries: list) -> str:
-    client = genai.Client(api_key=GEMINI_API_KEY)
+def collect_news(queries: list, history: dict | None = None) -> str:
+    client    = genai.Client(api_key=GEMINI_API_KEY)
+    now       = datetime.now()
+    week_num  = now.isocalendar()[1]
+    week_ord  = ["첫째", "둘째", "셋째", "넷째", "다섯째"][(week_num - 1) % 5]
+    date_ctx  = f"{now.year}년 {now.month}월 {week_ord}주"
+
+    # 이전에 다룬 토픽 exclusion 문자열 빌드
+    past_topics = []
+    if history:
+        past_topics = (history.get("topics", []) + history.get("items", []))[-30:]
+    exclude_str = ""
+    if past_topics:
+        exclude_str = (
+            "\n⚠️ 아래 주제/토픽은 최근 이미 다뤘으니 반드시 제외하고 새로운 내용만 찾을 것:\n"
+            + ", ".join(past_topics[:20])
+        )
+
     collected = []
     for layer, query in queries:
         try:
+            prompt = (
+                f"[{date_ctx}] 다음 주제로 이번 주 최신 정보 5개를 찾아서 "
+                f"'제목 | 핵심내용 3문장' 형식으로 한국어 답변: {query}"
+                f"{exclude_str}"
+            )
             resp = client.models.generate_content(
                 model="gemini-2.5-flash",
-                contents=f"다음 주제로 이번 주 최신 정보 5개를 찾아서 '제목 | 핵심내용 3문장' 형식으로 한국어 답변: {query}",
+                contents=prompt,
                 config=types.GenerateContentConfig(
                     tools=[types.Tool(google_search=types.GoogleSearch())]
                 )
@@ -609,7 +630,7 @@ def main():
     print(f"\n📅 오늘 에디션: {edition_label}")
 
     print("\n📡 Gemini 뉴스 수집 중...")
-    news_text = collect_news(active_queries)
+    news_text = collect_news(active_queries, history)
     print("   수집 완료")
 
     if not news_text.strip():
