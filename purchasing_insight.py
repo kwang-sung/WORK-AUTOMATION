@@ -84,28 +84,29 @@ CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="
 # ─── Ghost RSS ────────────────────────────────────────────
 GHOST_RSS_URL = "https://abear-corp.ghost.io/rss/"
 
+def _strip_html(html: str) -> str:
+    """HTML 태그 제거 후 순수 텍스트 반환."""
+    import re
+    text = re.sub(r"<[^>]+>", " ", html)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
 def fetch_ghost_articles(max_items: int = 4) -> list[dict]:
-    """Ghost RSS에서 최신 아티클 목록 반환. 실패 시 빈 리스트."""
+    """Ghost RSS에서 최신 아티클 제목·본문 텍스트 반환. 실패 시 빈 리스트."""
     try:
         resp = requests.get(GHOST_RSS_URL, timeout=10,
                             headers={"User-Agent": "Mozilla/5.0"})
         resp.raise_for_status()
-        ns = {
-            "media":   "http://search.yahoo.com/mrss/",
-            "content": "http://purl.org/rss/1.0/modules/content/",
-        }
+        ns = {"content": "http://purl.org/rss/1.0/modules/content/"}
         root = ET.fromstring(resp.content)
         articles = []
         for item in root.findall(".//item")[:max_items]:
-            title  = (item.findtext("title") or "").strip()
-            link   = (item.findtext("link")  or "").strip()
-            desc   = (item.findtext("description") or "").strip()
-            date   = (item.findtext("pubDate") or "").strip()
-            img_el = item.find("media:content", ns)
-            img    = img_el.get("url", "") if img_el is not None else ""
-            if title and link:
-                articles.append({"title": title, "link": link,
-                                  "desc": desc, "date": date, "img": img})
+            title    = (item.findtext("title") or "").strip()
+            encoded  = item.find("content:encoded", ns)
+            body_html = encoded.text if encoded is not None and encoded.text else ""
+            body_text = _strip_html(body_html)[:2000] if body_html else _strip_html(item.findtext("description") or "")
+            if title and body_text:
+                articles.append({"title": title, "body": body_text})
         return articles
     except Exception as e:
         print(f"  ⚠️  Ghost RSS 로드 실패: {e}")
@@ -113,28 +114,40 @@ def fetch_ghost_articles(max_items: int = 4) -> list[dict]:
 
 
 def build_ghost_section_html(articles: list[dict]) -> str:
-    """Ghost 아티클 목록을 네이버 카페 호환 table 기반 HTML 블록으로 변환."""
+    """Ghost 아티클 본문을 Claude로 분석해 셀러 인사이트 HTML 섹션 생성."""
     if not articles:
         return ""
-    cards = ""
-    for a in articles:
-        title = a["title"].replace("<", "&lt;").replace(">", "&gt;")
-        desc  = a["desc"].replace("<", "&lt;").replace(">", "&gt;")
-        link  = a["link"]
-        date  = a["date"][:16] if a["date"] else ""
-        cards += f"""<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-bottom:12px;">
-<tr><td style="background-color:#ffffff;border:1px solid #e2e8f0;border-top:4px solid #7c3aed;border-radius:12px;padding:20px 22px;">
-<p style="font-size:15px;font-weight:800;color:#0f172a;margin:0 0 8px 0;"><a href="{link}" style="color:#0f172a;text-decoration:none;">{title}</a></p>
-<p style="font-size:13px;color:#475569;line-height:1.85;margin:0 0 10px 0;">{desc}</p>
-<p style="font-size:12px;color:#94a3b8;margin:0;">{date}&nbsp;&nbsp;<a href="{link}" style="color:#7c3aed;font-weight:700;text-decoration:none;">자세히 보기 →</a></p>
-</td></tr></table>
-"""
-    return f"""<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:28px 0 14px 0;">
-<tr><td style="border-left:5px solid #7c3aed;padding-left:14px;">
-<p style="font-size:20px;font-weight:900;color:#1e293b;margin:0;">📰 셀러 필독 아티클</p>
-<p style="font-size:13px;color:#64748b;margin:6px 0 0 0;">쿠대 파트너 abear-corp 선별 콘텐츠</p>
-</td></tr></table>
-{cards}"""
+
+    combined = ""
+    for i, a in enumerate(articles, 1):
+        combined += f"\n[자료{i}] {a['title']}\n{a['body']}\n"
+
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    prompt = f"""아래는 이커머스·구매대행 관련 최신 자료들입니다.
+이 자료들에서 셀러에게 실질적으로 유용한 핵심 인사이트를 3~4가지 뽑아
+네이버 카페 복붙 가능한 HTML로 작성하세요.
+
+규칙:
+- 외부 링크 절대 포함 금지
+- 출처 표기 금지
+- 인사이트를 쿠대 마스터 관점에서 직접 풀어서 설명
+- 각 인사이트: 제목(한 줄) + 본문(2~3문장) + 셀러 액션 1줄
+- 네이버 카페 호환: div background-color 금지, table 구조 사용, flex/grid 금지
+- 섹션 헤더 포함: "📋 이번 주 셀러 체크포인트"
+- 인라인 CSS만 사용, 코드블록 없이 순수 HTML만 반환
+
+자료:
+{combined}"""
+
+    try:
+        with client.messages.stream(
+            model="claude-sonnet-5", max_tokens=4000,
+            messages=[{"role": "user", "content": prompt}]
+        ) as stream:
+            return stream.get_final_text().strip()
+    except Exception as e:
+        print(f"  ⚠️  Ghost 인사이트 생성 실패: {e}")
+        return ""
 
 
 # ─── 0. 발행 이력 관리 ────────────────────────────────────
@@ -266,12 +279,14 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
     weekday   = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
     issue_num = datetime.now().strftime("%Y%m%d")
 
-    print("  📰 Ghost RSS 아티클 로드 중...")
+    print("  📰 Ghost RSS 조사 중...")
     ghost_articles = fetch_ghost_articles(4)
-    GHOST_SECTION  = build_ghost_section_html(ghost_articles)
     if ghost_articles:
-        print(f"     {len(ghost_articles)}개 아티클 로드 완료")
+        print(f"     {len(ghost_articles)}개 아티클 본문 수집 → Claude 인사이트 추출 중...")
+        GHOST_SECTION = build_ghost_section_html(ghost_articles)
+        print("     인사이트 섹션 생성 완료")
     else:
+        GHOST_SECTION = ""
         print("     ⚠️  아티클 없음 — 섹션 생략")
 
     CTA_CAFE = """<div style="background-color:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #e2b04a;border-radius:0 12px 12px 0;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:24px 0 8px 0;">
@@ -340,7 +355,7 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 8. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
 {CAFE_REVIEW_TABLE}
 "안녕하세요, 쿠대 마스터입니다." 로 시작 — 전술(당장 팔 것)과 전략(방향) 두 가지를 연결하는 인사이트 4~5문장, "다음에도 알찬 정보로 찾아오겠습니다 🏄" 로 마무리
-9. 📰 셀러 필독 아티클 - 아래 HTML을 그대로 삽입 (비어있으면 생략):
+9. 📋 이번 주 셀러 체크포인트 - 아래 HTML을 그대로 삽입 (비어있으면 생략):
 {GHOST_SECTION}
 10. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
 {CAFE_SNS_BANNER}
@@ -440,7 +455,7 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
 8. 🏄 쿠대 마스터 총평 - 반드시 아래 table HTML을 그대로 복사하고 [총평내용] 텍스트만 교체할 것. div 사용 절대 금지:
 {CAFE_REVIEW_TABLE}
 "안녕하세요, 쿠대 마스터입니다." 로 시작 — 이번 주 운영 핵심을 한 줄로 압축, 지금 당장 할 수 있는 행동 1가지 제안, "다음 월요일 소싱 인사이트로 찾아오겠습니다 🏄" 로 마무리
-9. 📰 셀러 필독 아티클 - 아래 HTML을 그대로 삽입 (비어있으면 생략):
+9. 📋 이번 주 셀러 체크포인트 - 아래 HTML을 그대로 삽입 (비어있으면 생략):
 {GHOST_SECTION}
 10. 하단 SNS 배너 - 아래 HTML을 그대로 삽입:
 {CAFE_SNS_BANNER}
