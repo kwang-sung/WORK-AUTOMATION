@@ -16,7 +16,6 @@ import base64
 import smtplib
 import requests
 import anthropic
-import xml.etree.ElementTree as ET
 from google import genai
 from google.genai import types
 from datetime import datetime
@@ -81,72 +80,79 @@ CAFE_SNS_BANNER = """<table width="100%" cellpadding="0" cellspacing="0" style="
 </table>"""
 
 
-# ─── Ghost RSS ────────────────────────────────────────────
-GHOST_RSS_URL = "https://abear-corp.ghost.io/rss/"
+# ─── 셀러 체크포인트 (Gemini 검색 기반) ──────────────────
+CHECKPOINT_QUERIES = [
+    ("쿠팡/네이버 공지",   "쿠팡 Wing 로켓그로스 OR 네이버 스마트스토어 셀러 정책 변경 공지 최신"),
+    ("관세·통관",         "관세청 수입통관 규정 변경 구매대행 최신"),
+    ("이커머스 동향",      "이커머스 온라인 셀러 주의사항 플랫폼 변화 최신 한국"),
+    ("해외 소싱 플랫폼",   "알리익스프레스 타오바오 1688 한국 셀러 정책 배송 변경 최신"),
+]
 
-def _strip_html(html: str) -> str:
-    """HTML 태그 제거 후 순수 텍스트 반환."""
-    import re
-    text = re.sub(r"<[^>]+>", " ", html)
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
+def build_seller_checkpoint_section(history: dict | None = None) -> str:
+    """Gemini Google Search로 공식 소스 수집 → Claude로 셀러 체크포인트 HTML 생성."""
+    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+    now      = datetime.now()
+    week_num = now.isocalendar()[1]
+    week_ord = ["첫째", "둘째", "셋째", "넷째", "다섯째"][(week_num - 1) % 5]
+    date_ctx = f"{now.year}년 {now.month}월 {week_ord}주"
 
-def fetch_ghost_articles(max_items: int = 4) -> list[dict]:
-    """Ghost RSS에서 최신 아티클 제목·본문 텍스트 반환. 실패 시 빈 리스트."""
-    try:
-        resp = requests.get(GHOST_RSS_URL, timeout=10,
-                            headers={"User-Agent": "Mozilla/5.0"})
-        resp.raise_for_status()
-        ns = {"content": "http://purl.org/rss/1.0/modules/content/"}
-        root = ET.fromstring(resp.content)
-        articles = []
-        for item in root.findall(".//item")[:max_items]:
-            title    = (item.findtext("title") or "").strip()
-            encoded  = item.find("content:encoded", ns)
-            body_html = encoded.text if encoded is not None and encoded.text else ""
-            body_text = _strip_html(body_html)[:2000] if body_html else _strip_html(item.findtext("description") or "")
-            if title and body_text:
-                articles.append({"title": title, "body": body_text})
-        return articles
-    except Exception as e:
-        print(f"  ⚠️  Ghost RSS 로드 실패: {e}")
-        return []
+    past_topics = []
+    if history:
+        past_topics = (history.get("topics", []) + history.get("items", []))[-20:]
+    exclude_str = ""
+    if past_topics:
+        exclude_str = (
+            "\n⚠️ 아래 주제는 최근 이미 다뤘으니 제외하고 새 내용만 찾을 것: "
+            + ", ".join(past_topics[:15])
+        )
 
+    collected = []
+    for label, query in CHECKPOINT_QUERIES:
+        try:
+            prompt = (
+                f"[{date_ctx}] {query} — 셀러에게 실질적으로 중요한 최신 정보 3가지를 "
+                f"'제목 | 핵심내용 2문장' 형식으로 한국어 답변{exclude_str}"
+            )
+            resp = gemini_client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[types.Tool(google_search=types.GoogleSearch())]
+                )
+            )
+            collected.append(f"[{label}]\n{resp.text}")
+            print(f"    ✅ [{label}] 검색 완료")
+        except Exception as e:
+            print(f"    ⚠️  [{label}] 실패: {e}")
 
-def build_ghost_section_html(articles: list[dict]) -> str:
-    """Ghost 아티클 본문을 Claude로 분석해 셀러 인사이트 HTML 섹션 생성."""
-    if not articles:
+    if not collected:
         return ""
 
-    combined = ""
-    for i, a in enumerate(articles, 1):
-        combined += f"\n[자료{i}] {a['title']}\n{a['body']}\n"
-
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    prompt = f"""아래는 이커머스·구매대행 관련 최신 자료들입니다.
-이 자료들에서 셀러에게 실질적으로 유용한 핵심 인사이트를 3~4가지 뽑아
-네이버 카페 복붙 가능한 HTML로 작성하세요.
+    combined = "\n\n".join(collected)
+    claude_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    prompt = f"""아래는 이번 주 공식 플랫폼·뉴스에서 수집한 이커머스·구매대행 최신 정보입니다.
+셀러에게 실질적으로 유용한 핵심 체크포인트 3~4가지를 뽑아 HTML로 작성하세요.
 
 규칙:
 - 외부 링크 절대 포함 금지
 - 출처 표기 금지
-- 인사이트를 쿠대 마스터 관점에서 직접 풀어서 설명
-- 각 인사이트: 제목(한 줄) + 본문(2~3문장) + 셀러 액션 1줄
+- 쿠대 마스터 관점에서 직접 풀어서 설명 (자신의 인사이트처럼)
+- 각 항목: 제목(한 줄) + 본문(2~3문장) + 셀러 액션 1줄
 - 네이버 카페 호환: div background-color 금지, table 구조 사용, flex/grid 금지
 - 섹션 헤더 포함: "📋 이번 주 셀러 체크포인트"
 - 인라인 CSS만 사용, 코드블록 없이 순수 HTML만 반환
 
-자료:
+수집 자료:
 {combined}"""
 
     try:
-        with client.messages.stream(
+        with claude_client.messages.stream(
             model="claude-sonnet-5", max_tokens=4000,
             messages=[{"role": "user", "content": prompt}]
         ) as stream:
             return stream.get_final_text().strip()
     except Exception as e:
-        print(f"  ⚠️  Ghost 인사이트 생성 실패: {e}")
+        print(f"  ⚠️  셀러 체크포인트 생성 실패: {e}")
         return ""
 
 
@@ -279,15 +285,12 @@ def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
     weekday   = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
     issue_num = datetime.now().strftime("%Y%m%d")
 
-    print("  📰 Ghost RSS 조사 중...")
-    ghost_articles = fetch_ghost_articles(4)
-    if ghost_articles:
-        print(f"     {len(ghost_articles)}개 아티클 본문 수집 → Claude 인사이트 추출 중...")
-        GHOST_SECTION = build_ghost_section_html(ghost_articles)
-        print("     인사이트 섹션 생성 완료")
+    print("  📋 셀러 체크포인트 수집 중 (Gemini 검색)...")
+    GHOST_SECTION = build_seller_checkpoint_section(history)
+    if GHOST_SECTION:
+        print("     체크포인트 섹션 생성 완료")
     else:
-        GHOST_SECTION = ""
-        print("     ⚠️  아티클 없음 — 섹션 생략")
+        print("     ⚠️  체크포인트 생성 실패 — 섹션 생략")
 
     CTA_CAFE = """<div style="background-color:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #e2b04a;border-radius:0 12px 12px 0;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:24px 0 8px 0;">
   <div style="flex:1;">
