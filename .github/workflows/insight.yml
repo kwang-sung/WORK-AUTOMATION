@@ -5,6 +5,11 @@ on:
     - cron: '30 0 * * 1'   # 매주 월요일 KST 09:30
     - cron: '30 0 * * 4'   # 매주 목요일 KST 09:30
   workflow_dispatch:
+    inputs:
+      force:
+        description: '중복 차단 무시하고 강제 재발행 (같은 날 다시 보낼 때)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -33,3 +38,4 @@ jobs:
           RECIPIENT_EMAIL:    ${{ secrets.RECIPIENT_EMAIL }}
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY:  ${{ github.repository }}
+          FORCE_RUN:          ${{ inputs.force }}

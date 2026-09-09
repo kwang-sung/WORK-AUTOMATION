@@ -36,6 +36,8 @@ RECIPIENT_EMAIL   = os.environ.get("RECIPIENT_EMAIL", "")
 GITHUB_TOKEN      = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPO       = os.environ.get("GITHUB_REPOSITORY", "")
 HISTORY_FILE      = "data/insight_history.json"
+# 같은 날 재발행 허용 (수동 재실행용). 워크플로우 입력으로 true 전달 시 활성
+FORCE_RUN         = os.environ.get("FORCE_RUN", "").strip().lower() in ("true", "1", "yes")
 
 # 월요일 — 시장 조망 / 소싱 발굴
 SEARCH_QUERIES_MON = [
@@ -699,9 +701,14 @@ def main():
 
     today_key = datetime.now().strftime('%Y-%m-%d')
     if history.get("last_sent") == today_key:
-        print(f"\n⚠️  오늘({today_key}) 이미 발행 완료 — 중복 실행 차단")
-        print("=" * 55)
-        return
+        if FORCE_RUN:
+            print(f"\n🔁 오늘({today_key}) 이미 발행됐지만 FORCE_RUN=true — 강제 재발행")
+        else:
+            print(f"\n⚠️  오늘({today_key}) 이미 발행 완료 — 중복 실행 차단")
+            print("   재발행하려면 Actions에서 'Run workflow' 실행 시")
+            print("   '중복 차단 무시하고 강제 재발행'을 true로 설정하세요.")
+            print("=" * 55)
+            return
 
     weekday_num  = datetime.now().weekday()  # 0=월 3=목
     is_thursday  = weekday_num == 3
