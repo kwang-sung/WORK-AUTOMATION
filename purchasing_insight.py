@@ -299,7 +299,7 @@ def remove_duplicates(news_text: str, history: dict) -> str:
 
 
 # ─── 3. Claude 글쓰기 ─────────────────────────────────────
-def generate_content(news_text: str, is_thursday: bool = False) -> tuple:
+def generate_content(news_text: str, is_thursday: bool = False, history: dict | None = None) -> tuple:
     client    = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     today     = datetime.now().strftime("%Y년 %m월 %d일")
     weekday   = ["월", "화", "수", "목", "금", "토", "일"][datetime.now().weekday()]
@@ -683,7 +683,7 @@ def main():
     new_items, new_topics = extract_history_items(news_text)
 
     print("\n✍️  Claude 콘텐츠 작성 중...")
-    cafe_html = generate_content(news_text, is_thursday)
+    cafe_html = generate_content(news_text, is_thursday, history)
     print("   작성 완료")
 
     print("\n🔍 팩트 검증 중...")
