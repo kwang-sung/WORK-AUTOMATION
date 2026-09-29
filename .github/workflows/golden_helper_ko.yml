@@ -1,9 +1,6 @@
 name: 골든헬퍼 KR - 통합 콘텐츠 (아이템 + 복지정보)
 
 on:
-  schedule:
-    - cron: '0 6 * * 1'   # 매주 월요일 KST 15:00
-    - cron: '0 6 * * 4'   # 매주 목요일 KST 15:00
   workflow_dispatch:
 
 concurrency:
