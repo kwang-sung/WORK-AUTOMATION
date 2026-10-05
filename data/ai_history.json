@@ -1,15 +1,5 @@
 {
   "items": [
-    "뮤즈 글리머",
-    "뮤즈 스파크 1.2",
-    "그록 4.6",
-    "엑사원",
-    "Isaac GR00T",
-    "Intercom Fin",
-    "Jasper",
-    "Gemini",
-    "Gemini Omni Flash",
-    "Anthropic",
     "HappyShrimp 1.0",
     "GLM-5.2 Turbo",
     "Qwen3.8-27B",
@@ -39,16 +29,19 @@
     "Anthropic",
     "##  AI 모델명/서비스명",
     "OpenAI",
-    "Navier-Stokes AI 모델"
+    "Navier-Stokes AI 모델",
+    "Gemini 4 Argon",
+    "Gemini Pro",
+    "OpenAI Dots",
+    "GPT-6 Astra",
+    "GPT-6.1 Sol",
+    "Aleph Alpha Kolibri",
+    "MAI-Voice-2.1",
+    "Perplexity Decider v1 27B",
+    "Claude Sonnet 5.5",
+    "Shopify Canvas"
   ],
   "topics": [
-    "재귀적 자기 개선",
-    "로봇 하드웨어 통합",
-    "차량용 AI 반도체",
-    "바이오 AI",
-    "단백질 구조 예측",
-    "추론 칩 성능",
-    "AI 칩셋 아키텍처",
     "자율주행",
     "모델 유출",
     "AGI",
@@ -81,7 +74,14 @@
     "AI 신뢰성",
     "수학계 검증",
     "AI 윤리",
-    "오픈AI 논란"
+    "오픈AI 논란",
+    "요금제 개편",
+    "상시작동 에이전트",
+    "사이버 보안 제한 접근",
+    "에이전트 코딩",
+    "음성 생성·인식",
+    "혼합 전문가(MoE) 모델",
+    "오픈소스"
   ],
-  "last_sent": "2026-09-28"
+  "last_sent": "2026-10-05"
 }
