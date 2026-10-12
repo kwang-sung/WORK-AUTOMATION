@@ -1,13 +1,5 @@
 {
   "items": [
-    "HappyShrimp 1.0",
-    "GLM-5.2 Turbo",
-    "Qwen3.8-27B",
-    "GLM-5.3",
-    "Suno",
-    "GPT-5.6 Luna",
-    "클로드 오푸스",
-    "AAR(자동 정렬 연구원)",
     "MHS(모델 하드웨어 스탠더드)",
     "이글-N",
     "K-폴드",
@@ -39,17 +31,17 @@
     "MAI-Voice-2.1",
     "Perplexity Decider v1 27B",
     "Claude Sonnet 5.5",
-    "Shopify Canvas"
+    "Shopify Canvas",
+    "Claude(Anthropic 내부 모델)",
+    "Gemini 동료 에이전트",
+    "Claude Haiku 5.5",
+    "GPT-6",
+    "ChatGPT 지능형 UI",
+    "Reka Edge 2603",
+    "Grok Imagine Video 1.5",
+    "Mistral Large 4"
   ],
   "topics": [
-    "자율주행",
-    "모델 유출",
-    "AGI",
-    "자동화된 연구 인턴",
-    "사이버 보안",
-    "AI 에이전트 오작동",
-    "투명성 강화",
-    "코딩 성능 향상",
     "경량 모델",
     "비용 효율성",
     "AI 네이티브 전자상거래",
@@ -81,7 +73,15 @@
     "에이전트 코딩",
     "음성 생성·인식",
     "혼합 전문가(MoE) 모델",
-    "오픈소스"
+    "오픈소스",
+    "AI 안전/오작동",
+    "백악관 보고 의무화",
+    "엔터프라이즈 AI 에이전트",
+    "업무 자동화",
+    "모델 가격 인하",
+    "추론 성능 향상",
+    "대화형 시각 UI",
+    "비디오"
   ],
-  "last_sent": "2026-10-05"
+  "last_sent": "2026-10-12"
 }
