@@ -1,9 +1,10 @@
 name: 쿠대 자동화 업무 — 시니어 건강 일본어
 
 on:
-  schedule:
-    - cron: '0 6 * * 1'   # 매주 월요일 KST 15:00
-    - cron: '0 6 * * 4'   # 매주 목요일 KST 15:00
+  # 2026-10-15 마스터 지시로 자동 실행 중지. 재개하려면 아래 세 줄의 주석(#)을 푼다.
+  # schedule:
+  #   - cron: '0 6 * * 1'   # 매주 월요일 KST 15:00
+  #   - cron: '0 6 * * 4'   # 매주 목요일 KST 15:00
   workflow_dispatch:
 
 concurrency:
