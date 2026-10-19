@@ -1,15 +1,5 @@
 {
   "items": [
-    "MHS(모델 하드웨어 스탠더드)",
-    "이글-N",
-    "K-폴드",
-    "알파폴드3",
-    "할라페뇨",
-    "애플 M5 울트라",
-    "M6",
-    "Fable 5.1",
-    "GPT-6 아스트라",
-    "제미나이 3.8 플래시",
     "제미나이 3.8 플래시 사이버",
     "뮤즈 스파크 1.3",
     "Qwen3.8-Max-0902",
@@ -39,19 +29,19 @@
     "ChatGPT 지능형 UI",
     "Reka Edge 2603",
     "Grok Imagine Video 1.5",
-    "Mistral Large 4"
+    "Mistral Large 4",
+    "Claude Marketplace",
+    "Grok Voice 3.0",
+    "Muse Wonder",
+    "Muse Spark",
+    "DeepSeek V4.1 Flash 1017",
+    "Spangle Halo",
+    "Agent Commerce Toolkit",
+    "Agentic Checkout",
+    "모두의 AI",
+    "Voice Agent API"
   ],
   "topics": [
-    "경량 모델",
-    "비용 효율성",
-    "AI 네이티브 전자상거래",
-    "신모델 경쟁",
-    "**** AI 안전",
-    "IPO 철회",
-    "기업공개(IPO)",
-    "AI 개발 속도 조절",
-    "AI 정렬(Alignment)",
-    "샘 알트만",
     "다리오 아모데이",
     "AI 규제",
     "안전 우려",
@@ -81,7 +71,17 @@
     "모델 가격 인하",
     "추론 성능 향상",
     "대화형 시각 UI",
-    "비디오"
+    "비디오",
+    "AI 모델 출시",
+    "현금 흐름 흑자",
+    "AI 웜/자기 복제 위험",
+    "스피치-투-스피치",
+    "에이전트 AI",
+    "AI 쇼핑 에이전트",
+    "이커머스 자동화",
+    "결제 통제",
+    "플러그인 생태계",
+    "국산 AI 모델"
   ],
-  "last_sent": "2026-10-12"
+  "last_sent": "2026-10-19"
 }
